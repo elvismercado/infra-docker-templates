@@ -34,7 +34,6 @@ services:
       # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
       # preferably download this compose file and others onto the root folder where immich should live
       - ${UPLOAD_LOCATION}:/data
-      - /etc/localtime:/etc/localtime:ro
     ports:
       - ${HTTP_PORT:-2283}:2283
     environment:
