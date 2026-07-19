@@ -1,0 +1,8 @@
+# WUD: notify only so updates can use the backup-first update script
+
+services:
+  vrising:
+    labels:
+      - "wud.watch=true"
+      - "wud.tag.include=^vrising$$"
+      - "wud.trigger.include=smtp.gmail"

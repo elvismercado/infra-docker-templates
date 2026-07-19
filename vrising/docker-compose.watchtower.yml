@@ -1,0 +1,6 @@
+# Enable/Disable Watchtower
+
+services:
+  vrising:
+    labels:
+      - "com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-false}"
