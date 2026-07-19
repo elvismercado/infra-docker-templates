@@ -34,12 +34,25 @@ load_environment() {
     RUN_UID="${RUN_UID:-99}"
     GID="${GID:-100}"
     BACKUP_RETENTION="${BACKUP_RETENTION:-14}"
+    WATCHTOWER_ENABLE="${WATCHTOWER_ENABLE:-false}"
+    WUD_ENABLE="${WUD_ENABLE:-false}"
     DATA_ROOT="${VOLUMES_BASE}/${CONTAINER_NAME}"
     SERVERFILES_DIR="${DATA_ROOT}/serverfiles"
     SAVE_DATA_DIR="${SERVERFILES_DIR}/save-data"
     BACKUP_DIR="${DATA_ROOT}/backups"
     LOCK_DIR="${DATA_ROOT}/.maintenance.lock"
+
+    # Assemble the compose command with the same overlays used at deploy time so
+    # every script (setup/backup/restore/update) recreates the container with a
+    # consistent set of labels. Each overlay is appended only when its flag is
+    # enabled and the file exists.
     COMPOSE_CMD=(docker compose --env-file "${ENV_FILE}" -f "${PROJECT_DIR}/docker-compose.yml")
+    if [ "${WATCHTOWER_ENABLE}" = "true" ] && [ -f "${PROJECT_DIR}/docker-compose.watchtower.yml" ]; then
+        COMPOSE_CMD+=(-f "${PROJECT_DIR}/docker-compose.watchtower.yml")
+    fi
+    if [ "${WUD_ENABLE}" = "true" ] && [ -f "${PROJECT_DIR}/docker-compose.wud.yml" ]; then
+        COMPOSE_CMD+=(-f "${PROJECT_DIR}/docker-compose.wud.yml")
+    fi
 }
 
 compose() {

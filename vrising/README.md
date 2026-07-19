@@ -140,6 +140,66 @@ Administrators can be added one Steam ID per line to:
 serverfiles/save-data/Settings/adminlist.txt
 ```
 
+See [Server administration](#server-administration) for the automated and manual
+options.
+
+## Server administration
+
+Admins can use the in-game console for commands such as `kick`, `banuser`,
+`bancharacter`, `banned`, and `unban`. Getting admin has two parts: listing your
+Steam ID on the server, then authenticating in-game.
+
+### 1. Find your steamID64
+
+You need the 17-digit steamID64 (starts with `7656119...`), not your display
+name or vanity URL. Look it up from your profile URL or a resolver such as
+steamid.io / steamdb.info.
+
+### 2. List admins
+
+Two options:
+
+**Automated (recommended) — driven by `.env`:**
+
+Set `ADMIN_STEAM_IDS` in `.env` (space-, comma-, or newline-separated):
+
+```bash
+ADMIN_STEAM_IDS='76561198000000000 76561198000000001'
+```
+
+On every container start, the mounted hook (`scripts/adminlist-hook.sh`, mapped
+to the image's `/opt/custom/user.sh`) regenerates
+`serverfiles/save-data/Settings/adminlist.txt` from this value. V Rising
+hot-reloads that file, so to apply a change you can simply restart the container:
+
+```bash
+docker compose restart --timeout 120
+```
+
+Invalid entries (anything that is not 17 digits) are skipped with a log message.
+Because the file is rewritten from `.env` on start, do not also edit
+`adminlist.txt` by hand when using this option — your edits are overwritten.
+
+**Manual — leave `ADMIN_STEAM_IDS` empty:**
+
+When `ADMIN_STEAM_IDS` is empty, the hook does nothing and you maintain the file
+yourself, one Steam ID per line:
+
+```text
+serverfiles/save-data/Settings/adminlist.txt
+```
+
+This file also hot-reloads, so no restart is required after editing it directly.
+
+### 3. Authenticate in-game
+
+Enable the console in the game's options, press `` ~ `` to open it, and run
+`adminauth`. You are then an admin for that session.
+
+`MAX_CONNECTED_ADMINS` reserves slots so listed admins can join even when the
+server is full. Bans made in-game are written to
+`serverfiles/save-data/Settings/banlist.txt`, which the hook never modifies.
+
 ## Networking and OPNsense
 
 The defaults are:

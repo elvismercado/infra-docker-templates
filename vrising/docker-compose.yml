@@ -31,6 +31,8 @@ services:
     volumes:
       - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-vrising}/steamcmd:/serverdata/steamcmd
       - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-vrising}/serverfiles:/serverdata/serverfiles
+      # Regenerates adminlist.txt from ADMIN_STEAM_IDS on start (ich777 hook).
+      - ./scripts/adminlist-hook.sh:/opt/custom/user.sh:ro
     environment:
       <<: *base-env
       GAME_ID: ${GAME_ID:-1829350}
@@ -46,6 +48,7 @@ services:
       VR_HIDE_IP_ADDRESS: ${HIDE_IP_ADDRESS:-true}
       VR_MAX_USERS: ${MAX_CONNECTED_USERS:-10}
       VR_MAX_ADMINS: ${MAX_CONNECTED_ADMINS:-4}
+      ADMIN_STEAM_IDS: ${ADMIN_STEAM_IDS:-}
       VR_FPS: ${SERVER_FPS:-30}
       VR_LOWER_FPS_WHEN_EMPTY: ${LOWER_FPS_WHEN_EMPTY:-true}
       VR_LOWER_FPS_WHEN_EMPTY_VALUE: ${LOWER_FPS_WHEN_EMPTY_VALUE:-5}
