@@ -3,10 +3,10 @@
 
 x-base-env: &base-env
   TZ: ${TZ:-Europe/London}
-  UID: ${UID}
-  GID: ${GID}
-  PUID: ${UID}
-  PGID: ${GID}
+  UID: ${UID:-1000}
+  GID: ${GID:-1000}
+  PUID: ${UID:-1000}
+  PGID: ${GID:-1000}
   UMASK: ${UMASK:-022}
 
 name: ${CONTAINER_NAME:-gitea}
@@ -20,7 +20,7 @@ networks:
 
 services:
   server:
-    image: docker.gitea.com/gitea:${IMAGE_VERSION:-1}
+    image: docker.gitea.com/gitea:${IMAGE_VERSION:-1.27.0}
     container_name: ${CONTAINER_NAME:-gitea}
     hostname: ${CONTAINER_NAME:-gitea}
     restart: always
@@ -33,10 +33,10 @@ services:
       - ${HTTP_PORT:-3000}:3000
     environment:
       <<: *base-env
-      USER_UID: ${UID}
-      USER_GID: ${GID}
-      GITEA__database__DB_TYPE: postgres
-      GITEA__database__HOST: db:5432
+      USER_UID: ${UID:-1000}
+      USER_GID: ${GID:-1000}
+      GITEA__database__DB_TYPE: ${DB_TYPE:-postgres}
+      GITEA__database__HOST: ${DB_HOST:-db:5432}
       GITEA__database__NAME: ${DB_NAME:-gitea}
       GITEA__database__USER: ${DB_USER:-gitea}
       GITEA__database__PASSWD: ${DB_PASSWORD:-gitea}
@@ -45,12 +45,20 @@ services:
       GITEA__service__REQUIRE_SIGNIN_VIEW: ${REQUIRE_SIGNIN_VIEW:-true}
       GITEA__service__DISABLE_REGISTRATION: ${DISABLE_REGISTRATION:-true}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+        restart: true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/healthz"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     labels:
       - "com.service=${CONTAINER_NAME:-gitea}"
 
   db:
-    image: postgres:${POSTGRES_VERSION:-14}
+    image: postgres:${POSTGRES_VERSION:-14.23}
     container_name: ${CONTAINER_NAME:-gitea}_db
     hostname: ${CONTAINER_NAME:-gitea}_db
     restart: always
@@ -62,11 +70,17 @@ services:
       POSTGRES_USER: ${DB_USER:-gitea}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-gitea}
       POSTGRES_DB: ${DB_NAME:-gitea}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-gitea} -d ${DB_NAME:-gitea}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     labels:
       - "com.service=${CONTAINER_NAME:-gitea}_db"
 
   runner:
-    image: gitea/act_runner:${RUNNER_VERSION:-latest}
+    image: gitea/runner:${RUNNER_VERSION:-2.1.0}
     container_name: ${CONTAINER_NAME:-gitea}_runner
     hostname: ${CONTAINER_NAME:-gitea}_runner
     restart: always
@@ -81,9 +95,11 @@ services:
     environment:
       TZ: ${TZ:-Europe/London}
       RUNNER_NETWORK: ${CONTAINER_NAME:-gitea}
-      GITEA_INSTANCE_URL: http://server:3000
+      GITEA_INSTANCE_URL: ${GITEA_INSTANCE_URL:-http://server:3000}
       GITEA_RUNNER_REGISTRATION_TOKEN: ${RUNNER_REGISTRATION_TOKEN:-}
     depends_on:
-      - server
+      server:
+        condition: service_healthy
+        restart: true
     labels:
       - "com.service=${CONTAINER_NAME:-gitea}_runner"
