@@ -28,7 +28,6 @@ services:
       - default
     volumes:
       - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-gitea}/data:/data
-      - /etc/localtime:/etc/localtime:ro
     ports:
       - ${HTTP_PORT:-3000}:3000
     environment:
