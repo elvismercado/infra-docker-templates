@@ -36,6 +36,11 @@ load_environment() {
     BACKUP_RETENTION="${BACKUP_RETENTION:-14}"
     WATCHTOWER_ENABLE="${WATCHTOWER_ENABLE:-false}"
     WUD_ENABLE="${WUD_ENABLE:-false}"
+    RCON_ENABLED="${RCON_ENABLED:-false}"
+    RCON_HOST_ADDRESS="${RCON_HOST_ADDRESS:-127.0.0.1}"
+    RCON_BIND_ADDRESS="${RCON_BIND_ADDRESS:-0.0.0.0}"
+    RCON_PORT="${RCON_PORT:-25575}"
+    RCON_PASSWORD="${RCON_PASSWORD:-CHANGE_ME}"
     DATA_ROOT="${VOLUMES_BASE}/${CONTAINER_NAME}"
     SERVERFILES_DIR="${DATA_ROOT}/serverfiles"
     SAVE_DATA_DIR="${SERVERFILES_DIR}/save-data"
@@ -43,15 +48,21 @@ load_environment() {
     LOCK_DIR="${DATA_ROOT}/.maintenance.lock"
 
     # Assemble the compose command with the same overlays used at deploy time so
-    # every script (setup/backup/restore/update) recreates the container with a
-    # consistent set of labels. Each overlay is appended only when its flag is
-    # enabled and the file exists.
+    # every script (setup/backup/restore/update) recreates the same container
+    # configuration. Each overlay is appended only when its flag is enabled.
     COMPOSE_CMD=(docker compose --env-file "${ENV_FILE}" -f "${PROJECT_DIR}/docker-compose.yml")
     if [ "${WATCHTOWER_ENABLE}" = "true" ] && [ -f "${PROJECT_DIR}/docker-compose.watchtower.yml" ]; then
         COMPOSE_CMD+=(-f "${PROJECT_DIR}/docker-compose.watchtower.yml")
     fi
     if [ "${WUD_ENABLE}" = "true" ] && [ -f "${PROJECT_DIR}/docker-compose.wud.yml" ]; then
         COMPOSE_CMD+=(-f "${PROJECT_DIR}/docker-compose.wud.yml")
+    fi
+    if [ "${RCON_ENABLED}" = "true" ] && [ ! -f "${PROJECT_DIR}/docker-compose.rcon.yml" ]; then
+        echo "ERROR: RCON is enabled but docker-compose.rcon.yml is missing." >&2
+        return 1
+    fi
+    if [ "${RCON_ENABLED}" = "true" ]; then
+        COMPOSE_CMD+=(-f "${PROJECT_DIR}/docker-compose.rcon.yml")
     fi
 }
 
@@ -60,7 +71,7 @@ compose() {
 }
 
 container_id() {
-    compose ps -q "${SERVICE_NAME}"
+    compose ps --all -q "${SERVICE_NAME}"
 }
 
 container_is_running() {

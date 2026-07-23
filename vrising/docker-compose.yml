@@ -57,10 +57,16 @@ services:
       VR_LIST_ON_STEAM: ${LIST_ON_STEAM:-true}
       VR_LIST_ON_EOS: ${LIST_ON_EOS:-true}
       VR_PRESET: ${GAME_SETTINGS_PRESET:-StandardPvE}
+      VR_DIFFICULTY_PRESET:
       VR_SAVE_NAME: ${WORLD_NAME:-friends-world}
       VR_SAVE_COUNT: ${AUTO_SAVE_COUNT:-30}
       VR_SAVE_INTERVAL: ${AUTO_SAVE_INTERVAL:-120}
-      VR_RCON_ENABLED: ${RCON_ENABLED:-false}
+      VR_AUTOSAVESMARTKEEP:
+      VR_LAN_MODE:
+      VR_RESET_DAYS_INTERVAL:
+      VR_DAY_OF_RESET:
+      VR_SAFE_RECONNECT_TIME:
+      VR_SAFE_RECONNECT_SLOTS:
     healthcheck:
       test: ["CMD-SHELL", "pidof VRisingServer.exe >/dev/null || exit 1"]
       interval: 30s

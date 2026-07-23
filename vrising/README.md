@@ -12,6 +12,11 @@ The template uses
 V Rising has no native Linux dedicated-server binary. SteamCMD downloads App ID
 `1829350` anonymously and checks for game updates whenever the container starts.
 
+The current ich777 container image was published on December 19, 2024. That date
+applies to its Wine and startup-script layer, not to the V Rising server files.
+Those files live in the persistent `serverfiles` directory and SteamCMD updates
+them from the current default branch on every container start.
+
 ## Persistent layout
 
 With the defaults, runtime files are stored outside the repository:
@@ -38,7 +43,8 @@ future AMP, Pterodactyl, or Pelican installation.
 - Two unused UDP ports
 - OPNsense access when friends connect from the internet
 
-No Steam account, Windows VM, privileged mode, GPU, or RCON port is required.
+No Steam account, Windows VM, privileged mode, GPU, or RCON port is required for
+the default deployment.
 
 ## Setup
 
@@ -120,6 +126,31 @@ The generated files are:
 The image's `SERVER_NAME` and `WORLD_NAME` values are also supplied on the
 command line because its startup script consumes them directly.
 
+### Optional V Rising 1.1 host settings
+
+The following official environment overrides are available but left commented
+in `.env.example`, so V Rising keeps its shipped defaults until you opt in:
+
+```bash
+VR_DIFFICULTY_PRESET=Difficulty_Normal
+VR_AUTOSAVESMARTKEEP='10:1:1,30:0:1,60:0:1,120:0:1,360:0:1,1440:0:1,52560000:99:0'
+VR_LAN_MODE=false
+VR_RESET_DAYS_INTERVAL=0
+VR_DAY_OF_RESET=Any
+VR_SAFE_RECONNECT_TIME=300
+VR_SAFE_RECONNECT_SLOTS=10
+```
+
+Difficulty presets are `Difficulty_Easy`, `Difficulty_Normal`, and
+`Difficulty_Brutal`. `VR_RESET_DAYS_INTERVAL=0` disables scheduled world
+resets; `VR_DAY_OF_RESET` accepts `Any` or a weekday name. Reconnect time is in
+seconds, and reconnect slots reserve capacity for recently disconnected
+players.
+
+`VR_AUTOSAVESMARTKEEP` uses comma-separated `minutes:newest:oldest` buckets.
+`AUTO_SAVE_COUNT` is still applied after those buckets are evaluated. Keep
+normal off-host backups even when smart retention is enabled.
+
 ### Custom gameplay settings
 
 `GAME_SETTINGS_PRESET=StandardPvE` loads the game-shipped preset. To use a
@@ -159,7 +190,7 @@ steamid.io / steamdb.info.
 
 Two options:
 
-**Automated (recommended) — driven by `.env`:**
+**Automated (recommended), driven by `.env`:**
 
 Set `ADMIN_STEAM_IDS` in `.env` (space-, comma-, or newline-separated):
 
@@ -178,9 +209,14 @@ docker compose restart --timeout 120
 
 Invalid entries (anything that is not 17 digits) are skipped with a log message.
 Because the file is rewritten from `.env` on start, do not also edit
-`adminlist.txt` by hand when using this option — your edits are overwritten.
+`adminlist.txt` by hand when using this option: your edits are overwritten.
 
-**Manual — leave `ADMIN_STEAM_IDS` empty:**
+On a completely fresh installation, the hook first lets SteamCMD install the
+server and lets ich777 copy the shipped JSON settings. `setup.sh` then performs
+one controlled restart to generate `adminlist.txt`. This avoids creating the
+persistent `Settings` directory too early.
+
+**Manual, with `ADMIN_STEAM_IDS` empty:**
 
 When `ADMIN_STEAM_IDS` is empty, the hook does nothing and you maintain the file
 yourself, one Steam ID per line:
@@ -200,6 +236,37 @@ Enable the console in the game's options, press `` ~ `` to open it, and run
 server is full. Bans made in-game are written to
 `serverfiles/save-data/Settings/banlist.txt`, which the hook never modifies.
 
+## Private RCON
+
+RCON is disabled by default. To enable the documented V Rising administration
+channel, set a unique password in `.env`:
+
+```bash
+RCON_ENABLED=true
+RCON_HOST_ADDRESS=127.0.0.1
+RCON_BIND_ADDRESS=0.0.0.0
+RCON_PORT=25575
+RCON_PASSWORD='replace-with-a-unique-password'
+```
+
+The maintenance scripts automatically add `docker-compose.rcon.yml` whenever
+`RCON_ENABLED=true`. For a manual Compose command, include the override:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.rcon.yml up -d
+```
+
+The default publishes TCP `25575` only on host loopback. A client running on the
+Docker host can connect to `127.0.0.1:25575`. If a trusted machine on the private
+LAN needs access, set `RCON_HOST_ADDRESS` to the Docker host's private LAN
+address and restrict access with the firewall. Never forward or publish RCON on
+WAN.
+
+V Rising documents commands including `help`, `announce`, `announcerestart`,
+`shutdown`, `cancelshutdown`, `name`, `description`, `password`, `version`, and
+`time`. Use a Source RCON-compatible client such as `mcrcon`. The server's
+undocumented HTTP API is intentionally not enabled by this template.
+
 ## Networking and OPNsense
 
 The defaults are:
@@ -211,7 +278,7 @@ The defaults are:
 
 In OPNsense, create WAN port forwards for UDP `9876` and UDP `9877` to the
 Unraid host's LAN address. Allow the associated firewall rules. Do not create a
-TCP rule and do not forward RCON.
+WAN TCP rule and do not forward RCON.
 
 All of these must match:
 
@@ -274,6 +341,13 @@ This creates a backup, stops the server, retains the current container image
 under a local `vrising-rollback` tag, pulls the image, recreates the container,
 lets SteamCMD update the game, and waits for health.
 
+If pulling the image fails, the script restarts the untouched original
+container. If the replacement cannot start or become healthy, it retags the
+saved image as the configured ich777 image, recreates the server with pulls
+disabled, and checks health again. The update still exits with an error after a
+successful recovery so the failed update remains visible. If automatic recovery
+also fails, the script prints the exact manual image-recovery commands.
+
 Container-image rollback does not undo game files already updated by SteamCMD.
 V Rising does not provide a general public command for downloading arbitrary
 old server builds. Keep backups before major releases and restore saves only
@@ -288,8 +362,9 @@ docker compose -f docker-compose.yml -f docker-compose.wud.yml up -d
 docker compose -f docker-compose.yml -f docker-compose.watchtower.yml up -d
 ```
 
-WUD is notification-only. Watchtower defaults to disabled and is less safe for
-this stateful server because it bypasses the backup-first update script.
+WUD watches digest changes for the exact mutable `vrising` tag and remains
+notification-only. Watchtower defaults to disabled and is less safe for this
+stateful server because it bypasses the backup-first update script.
 
 ## Troubleshooting
 

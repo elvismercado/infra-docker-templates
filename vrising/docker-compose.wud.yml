@@ -5,4 +5,5 @@ services:
     labels:
       - "wud.watch=true"
       - "wud.tag.include=^vrising$$"
+      - "wud.watch.digest=true"
       - "wud.trigger.include=smtp.gmail"

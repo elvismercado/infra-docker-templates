@@ -29,16 +29,21 @@ if [ -z "${ADMIN_STEAM_IDS:-}" ]; then
     exit 0
 fi
 
-# Mirror the server's own first-run behaviour: if the persistent Settings folder
-# does not exist yet, copy the shipped defaults first. This prevents pre-creating
-# the folder from suppressing the default ServerHostSettings.json /
-# ServerGameSettings.json that the server copies on first start.
-if [ ! -d "${SETTINGS_DIR}" ]; then
-    if [ -d "${DEFAULT_SETTINGS_DIR}" ]; then
+# On a fresh image this hook runs before SteamCMD installs the server. Defer
+# instead of creating Settings, otherwise ich777's startup script skips copying
+# the shipped ServerHostSettings.json and ServerGameSettings.json.
+if [ ! -d "${SETTINGS_DIR}" ] && [ ! -d "${DEFAULT_SETTINGS_DIR}" ]; then
+    echo "---adminlist: server defaults are not installed yet, deferring adminlist.txt---"
+    exit 0
+fi
+
+if [ -d "${DEFAULT_SETTINGS_DIR}" ]; then
+    if [ ! -d "${SETTINGS_DIR}" ]; then
         mkdir -p "${BASE_DIR}/save-data"
         cp -R "${DEFAULT_SETTINGS_DIR}" "${BASE_DIR}/save-data/"
-    else
-        mkdir -p "${SETTINGS_DIR}"
+    elif [ ! -f "${SETTINGS_DIR}/ServerHostSettings.json" ] &&
+        [ ! -f "${SETTINGS_DIR}/ServerGameSettings.json" ]; then
+        cp -Rn "${DEFAULT_SETTINGS_DIR}/." "${SETTINGS_DIR}/"
     fi
 fi
 
