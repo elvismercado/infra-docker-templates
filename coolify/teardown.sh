@@ -1,6 +1,6 @@
 #!/bin/bash
 # Coolify — Teardown Script
-# https://github.com/elvismercado/docker-templates
+# https://github.com/elvismercado/infra-docker-templates
 #
 # Reverses everything setup.sh creates. By default, data is preserved.
 # Pass --remove-data to also delete the data directory (database, configs, etc.)

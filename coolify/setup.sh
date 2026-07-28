@@ -1,6 +1,6 @@
 #!/bin/bash
 # Coolify — Idempotent Setup Script
-# https://github.com/elvismercado/docker-templates
+# https://github.com/elvismercado/infra-docker-templates
 #
 # =============================================================================
 # WHAT THIS IS

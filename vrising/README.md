@@ -94,7 +94,7 @@ restarting the dedicated server daily. On Unraid, add this command to the User
 Scripts plugin and schedule it for a quiet hour:
 
 ```bash
-cd /path/to/docker-templates/vrising && docker compose restart --timeout 120
+cd /path/to/infra-docker-templates/vrising && docker compose restart --timeout 120
 ```
 
 Every restart also makes SteamCMD check for a game-server update.
@@ -309,7 +309,7 @@ archives `save-data`, validates the archive, retains the newest
 For a daily Unraid User Scripts schedule:
 
 ```bash
-cd /path/to/docker-templates/vrising && ./scripts/backup.sh
+cd /path/to/infra-docker-templates/vrising && ./scripts/backup.sh
 ```
 
 Backups are stored under `/mnt/user/appdata/vrising/backups` by default. Include
