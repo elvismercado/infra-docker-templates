@@ -56,7 +56,7 @@ services:
       VR_SECURE: ${SECURE:-true}
       VR_LIST_ON_STEAM: ${LIST_ON_STEAM:-true}
       VR_LIST_ON_EOS: ${LIST_ON_EOS:-true}
-      VR_PRESET: ${GAME_SETTINGS_PRESET:-StandardPvE}
+      VR_PRESET: ${GAME_SETTINGS_PRESET-StandardPvE}
       VR_DIFFICULTY_PRESET:
       VR_SAVE_NAME: ${WORLD_NAME:-friends-world}
       VR_SAVE_COUNT: ${AUTO_SAVE_COUNT:-30}

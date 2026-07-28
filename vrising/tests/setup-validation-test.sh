@@ -95,13 +95,13 @@ run_setup() {
     PATH="${TEST_ROOT}/bin:${PATH}" bash "${TEST_PROJECT}/scripts/setup.sh"
 }
 
-echo "Step 1/4: Verifying defaults with optional settings unset..."
+echo "Step 1/5: Verifying defaults with optional settings unset..."
 write_base_env
 printf '%s\n' 'RCON_ENABLED=false' >> "${TEST_PROJECT}/.env"
 run_setup > "${TEST_ROOT}/defaults.log" 2>&1
 grep -q 'Setup complete.' "${TEST_ROOT}/defaults.log"
 
-echo "Step 2/4: Verifying valid optional settings and private RCON..."
+echo "Step 2/5: Verifying valid optional settings and private RCON..."
 write_base_env
 cat >> "${TEST_PROJECT}/.env" <<'EOF'
 VR_DIFFICULTY_PRESET=Difficulty_Normal
@@ -120,7 +120,7 @@ EOF
 run_setup > "${TEST_ROOT}/valid.log" 2>&1
 grep -q 'Setup complete.' "${TEST_ROOT}/valid.log"
 
-echo "Step 3/4: Verifying placeholder RCON password rejection..."
+echo "Step 3/5: Verifying placeholder RCON password rejection..."
 write_base_env
 cat >> "${TEST_PROJECT}/.env" <<'EOF'
 RCON_ENABLED=true
@@ -135,7 +135,7 @@ if run_setup > "${TEST_ROOT}/rcon-invalid.log" 2>&1; then
 fi
 grep -q 'Set a non-placeholder RCON_PASSWORD' "${TEST_ROOT}/rcon-invalid.log"
 
-echo "Step 4/4: Verifying malformed smart-retention rejection..."
+echo "Step 4/5: Verifying malformed smart-retention rejection..."
 write_base_env
 cat >> "${TEST_PROJECT}/.env" <<'EOF'
 VR_AUTOSAVESMARTKEEP='10:1,60:0:1'
@@ -146,5 +146,12 @@ if run_setup > "${TEST_ROOT}/retention-invalid.log" 2>&1; then
     exit 1
 fi
 grep -q 'minutes:newest:oldest buckets' "${TEST_ROOT}/retention-invalid.log"
+
+echo "Step 5/5: Verifying an explicitly empty gameplay preset..."
+write_base_env
+sed -i 's/^GAME_SETTINGS_PRESET=.*/GAME_SETTINGS_PRESET=/' "${TEST_PROJECT}/.env"
+printf '%s\n' 'RCON_ENABLED=false' >> "${TEST_PROJECT}/.env"
+run_setup > "${TEST_ROOT}/custom-settings.log" 2>&1
+grep -q 'Setup complete.' "${TEST_ROOT}/custom-settings.log"
 
 echo "All setup validation tests passed."

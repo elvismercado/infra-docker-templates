@@ -101,7 +101,8 @@ Every restart also makes SteamCMD check for a game-server update.
 
 ## Configuration
 
-The default is a password-protected, listed, secure PvE server for ten players:
+The default is a password-protected, listed, secure PvE server for ten concurrent
+players:
 
 - `StandardPvE`
 - server FPS 30
@@ -110,6 +111,11 @@ The default is a password-protected, listed, secure PvE server for ten players:
 - Steam and EOS listings enabled
 - EOS IP hiding enabled
 - RCON and BepInEx disabled
+
+`MAX_CONNECTED_USERS` controls total concurrent server capacity. It does not
+control clan membership. The Ansible role accepts 1 through 128 concurrent
+players. The default `ClanSize` is four members and is stored in
+`ServerGameSettings.json`.
 
 Host settings in `.env` are passed using V Rising's official `VR_*`
 environment overrides. V Rising applies process environment overrides after
@@ -157,9 +163,52 @@ normal off-host backups even when smart retention is enabled.
 custom `ServerGameSettings.json`:
 
 1. Gracefully stop the container.
-2. Set `GAME_SETTINGS_PRESET=` in `.env`.
-3. Edit the generated `ServerGameSettings.json`.
+2. Set `GAME_SETTINGS_PRESET=` in `.env`. An explicit empty value is required;
+	a named preset takes precedence over the JSON file.
+3. Edit the generated `ServerGameSettings.json`. For example, set the top-level
+	gameplay settings below:
+
+	```json
+	"ClanSize": 20,
+	"TeleportBoundItems": false,
+	"BatBoundItems": false,
+	"BatBoundShards": false
+	```
+
+	The documented current range is 1 through 50. The exact server build should
+	be verified before relying on the upper boundary. The three travel settings
+	are independent:
+
+	- `TeleportBoundItems=false` allows Waygates while carrying normally bound
+	  resource items such as wood, stone, and ore.
+	- `BatBoundItems=false` allows Bat Form while carrying normally bound resource
+	  items.
+	- `BatBoundShards=false` allows Bat Form while carrying Soul Shards.
+
+	The Ansible role exposes positive vault settings for these native flags:
+
+	```yaml
+	teleport_with_items: true
+	bat_form_with_items: true
+	bat_form_with_soul_shards: true
+	game_settings_preset: ""
+	```
+
+	A configured `true` value maps to the corresponding native `false` value
+	because the native keys describe whether the item remains bound. Each setting
+	is optional and independent. Omitting one leaves that native JSON key
+	unchanged. These settings cover the game's native bound-item categories; they
+	do not guarantee that every possible item or every other teleport restriction
+	can be bypassed.
+
+	Changing these settings requires a server restart. Items that were created
+	before the change may retain their existing bound status, so test both existing
+	and newly acquired items after applying the configuration.
 4. Start the container.
+
+The clan-size setting is separate from `MAX_CONNECTED_USERS`. A clan may be
+configured larger than the simultaneous player cap, but not all members could
+join at once.
 
 Do not edit defaults below
 `VRisingServer_Data/StreamingAssets/Settings`; SteamCMD updates can overwrite
@@ -408,5 +457,7 @@ For gameplay JSON changes, ensure `GAME_SETTINGS_PRESET` is empty.
 ## Sources
 
 - [Official V Rising 1.1.x PC dedicated-server instructions](https://github.com/StunlockStudios/vrising-dedicated-server-instructions/blob/master/1.1.x-pc/INSTRUCTIONS.md)
+- [Official V Rising 1.1.1 server game settings](https://cdn.stunlock.com/docs/vrising/VRising_Server_Game_Settings_1.1.1.pdf)
+- [V Rising clan-size setting reference](https://squadnox.com/guides/v-rising-maximum-clan-size)
 - [ich777 V Rising image source](https://github.com/ich777/docker-steamcmd-server/tree/vrising)
 - [ich777 Unraid template](https://github.com/ich777/docker-templates/blob/master/ich777/V-Rising.xml)
