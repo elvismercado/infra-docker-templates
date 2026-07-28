@@ -26,6 +26,16 @@ const currentSettings = {
   },
 };
 
+const parseSlurpedJson = (base64Content) => {
+  const decodedContent = Buffer.from(base64Content, 'base64').toString('utf8');
+  return JSON.parse(decodedContent.replace(/^\uFEFF/, ''));
+};
+
+const plainJsonBase64 = Buffer.from(JSON.stringify(currentSettings), 'utf8').toString('base64');
+const bomJsonBase64 = Buffer.from(`\uFEFF${JSON.stringify(currentSettings)}`, 'utf8').toString('base64');
+assert.deepEqual(parseSlurpedJson(plainJsonBase64), currentSettings);
+assert.deepEqual(parseSlurpedJson(bomJsonBase64), currentSettings);
+
 const mergeClanSize = (settings, clanSize) => ({
   ...settings,
   ClanSize: Number.parseInt(clanSize, 10),
