@@ -23,9 +23,12 @@ defined by this Compose project.
 1. Copy `.env.example` to `.env`.
 2. Replace both database passwords.
 3. Set `APP_URL` to the LAN URL browsers and Wings will use.
-4. Select Panel and Wings subnets that do not overlap the LAN, VPNs, or other
+4. For direct HTTP, set `PANEL_HTTP_PORT` to the same port used in `APP_URL`.
+   The Panel image configures its internal Caddy listener from `APP_URL`, and
+   this template publishes that same port on the host.
+5. Select Panel and Wings subnets that do not overlap the LAN, VPNs, or other
    Docker networks.
-5. Create the Panel bind mounts for the image's `www-data` user:
+6. Create the Panel bind mounts for the image's `www-data` user:
 
    ```bash
    mkdir -p /mnt/user/appdata/pelican/panel/{data,logs,plugins}
@@ -35,6 +38,8 @@ defined by this Compose project.
 
 The MariaDB image initializes ownership of its own data directory. Wings game
 files use `UID` and `GID`, which default to Unraid's `99:100` in `.env.example`.
+Keep `BEHIND_PROXY` disabled for direct LAN access. A future reverse-proxy
+deployment needs its own listener, trust, and TLS configuration.
 
 ## Bootstrap
 
