@@ -18,6 +18,23 @@ the separate `pelican_wings` management network. Wings creates and manages its
 game-container network from `/etc/pelican/config.yml`; that network is not
 defined by this Compose project.
 
+## Readiness states
+
+These states are separate:
+
+1. **Container healthy:** MariaDB accepts connections, Redis responds to PING,
+   or Panel's Caddy and PHP-FPM processes respond. Panel's Compose healthcheck
+   is intentionally liveness-only so a new installation can reach `/installer`.
+2. **Panel installed:** `APP_INSTALLED=true`, all Laravel migrations have run,
+   and an administrator can log in and log out successfully.
+3. **Node online:** Wings has started, can authenticate with Panel, and the
+   node reports online in **Admin > Nodes**.
+
+Do not treat the first state as proof of either of the other two. When the
+`wings` profile is enabled, the Ansible role checks the second state before it
+starts Wings. The node still needs to be verified in Panel because a running
+container or open TCP port does not prove authenticated registration.
+
 ## Before Starting
 
 1. Copy `.env.example` to `.env`.
@@ -131,6 +148,28 @@ docker exec pelican_panel sh -lc 'log=$(ls -1t /var/www/html/storage/logs/larave
 
 Do not manually change `APP_INSTALLED` back to `false` or rerun the full
 installer against a partially initialized database.
+
+### Start over with empty persistent state
+
+This is destructive and is not performed by Ansible. Removing containers,
+networks, or the Compose project does not reset the installation because Panel
+and MariaDB use bind-mounted data under `${VOLUMES_BASE}/${CONTAINER_NAME}`.
+
+Use this procedure only when the existing installation is disposable:
+
+1. Export a logical MariaDB backup and copy any Panel configuration or plugin
+   data that must be retained.
+2. Stop the stack with `docker compose --profile wings down`.
+3. Confirm that no game-server data under
+   `${VOLUMES_BASE}/${CONTAINER_NAME}/wings/volumes` must be retained.
+4. After an explicit operator confirmation, empty the `database`,
+   `panel/data`, `panel/logs`, `panel/plugins`, and `wings/config` directories.
+   Preserve `wings/volumes` unless all game-server data is intentionally being
+   discarded.
+5. Set `COMPOSE_PROFILES` empty and follow the first-pass bootstrap above.
+
+Do not run this procedure to repair a partial install until its database has
+been backed up and recovery has been ruled out.
 
 ### Configure the node and Wings
 
