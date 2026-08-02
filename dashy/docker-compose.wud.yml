@@ -1,4 +1,7 @@
-# WUD (What's Up Docker?) labels — notify + auto-update (minor/patch only)
+# WUD (What's Up Docker?) optional overlay for Dashy.
+# The Ansible Dashy role includes this file when enable_wud is true.
+# Direct Compose users must include this overlay explicitly.
+# Labels opt Dashy into WUD monitoring and minor/patch updates.
 
 services:
   dashy:
