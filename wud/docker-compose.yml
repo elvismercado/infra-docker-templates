@@ -41,12 +41,13 @@ services:
 
       ## Trigger — SMTP (Gmail) notifications in batch mode
       WUD_TRIGGER_SMTP_GMAIL_HOST: ${SMTP_HOST:-smtp.gmail.com}
-      WUD_TRIGGER_SMTP_GMAIL_PORT: ${SMTP_PORT:-465}
+      WUD_TRIGGER_SMTP_GMAIL_PORT: ${SMTP_PORT:-587}
       WUD_TRIGGER_SMTP_GMAIL_USER: ${SMTP_USERNAME}
       WUD_TRIGGER_SMTP_GMAIL_PASS: ${SMTP_PASSWORD}
-      WUD_TRIGGER_SMTP_GMAIL_FROM: ${SMTP_FROM}
+      WUD_TRIGGER_SMTP_GMAIL_FROM_ADDRESS: ${SMTP_FROM_ADDRESS}
+      WUD_TRIGGER_SMTP_GMAIL_FROM_NAME: ${SMTP_FROM_NAME:-}
       WUD_TRIGGER_SMTP_GMAIL_TO: ${SMTP_TO}
-      WUD_TRIGGER_SMTP_GMAIL_TLS_ENABLED: true
+      WUD_TRIGGER_SMTP_GMAIL_TLS_ENABLED: ${WUD_TLS_ENABLED:-false}
 
       ## Trigger — Docker auto-update (uses Docker API, no compose file mounting needed)
       ## Per-container opt-in via label: wud.trigger.docker.local.include=minor
