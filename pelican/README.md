@@ -50,9 +50,92 @@ Wings cannot start until the Panel has generated a node configuration. Keep
 docker compose up -d
 ```
 
-Open `APP_URL`, complete the installer, create the first administrator, and add
-a node for this host. Use the configured Wings API and SFTP ports when defining
-the node.
+### First Panel installation
+
+Pelican beta35 does not redirect a new installation from the login page to the
+installer. Append `/installer` to `APP_URL`; opening only `APP_URL` shows the
+login page before an administrator exists.
+
+Keep `.env` available while completing the wizard. Use these values:
+
+| Step | Field | Value |
+| --- | --- | --- |
+| Requirements | Checks | Continue only when every check passes |
+| Environment | App Name | `Pelican` (or another display name) |
+| Environment | App URL | The exact `APP_URL` value, without `/installer` |
+| Environment | Admin User | A new email, username, and unique password stored in a password manager |
+| Database | Driver | `MariaDB` |
+| Database | Host | `database` |
+| Database | Port | `3306` |
+| Database | Database | The `DB_NAME` value |
+| Database | Username | The `DB_USER` value |
+| Database | Password | The `DB_PASSWORD` value |
+| Eggs | Selection | Select none during first installation |
+| Cache | Driver | `Redis` |
+| Cache | Host | `cache` |
+| Cache | Port | `6379` |
+| Cache | Username | Leave blank |
+| Cache | Password | Leave blank |
+| Queue | Driver | `Redis` |
+| Session | Driver | `Redis` |
+
+The service names `database` and `cache` resolve only inside the Compose
+network. Do not substitute `localhost`, the Docker host address, or
+`DB_ROOT_PASSWORD`. Redis has no authentication in this isolated template.
+Eggs are optional; add only the required game eggs after the first
+administrator login works.
+
+Click **Finish** once and wait for migrations and administrator creation. If
+the page appears idle, inspect progress in another terminal with
+`docker logs --follow pelican_panel` instead of repeatedly submitting the
+form. Installation is complete only after the admin UI opens and the new
+administrator can log out and log back in with the saved email and password.
+
+#### Recover an incomplete beta35 installation
+
+Do not delete the containers, Panel data, or MariaDB data. Beta35 writes
+`APP_INSTALLED=true` before it runs migrations and creates the administrator.
+A failure after that write can send the browser to login without creating a
+usable account.
+
+The commands below use the default `CONTAINER_NAME=pelican`. Adjust
+`pelican_panel` if the container prefix was changed.
+
+```bash
+docker exec pelican_panel grep '^APP_INSTALLED=' /pelican-data/.env
+docker exec pelican_panel php artisan migrate:status
+docker logs --tail 200 pelican_panel
+docker exec pelican_panel sh -lc 'log=$(ls -1t /var/www/html/storage/logs/laravel-*.log 2>/dev/null | head -n 1); if [ -n "$log" ]; then tail -n 200 "$log"; else echo "No Laravel log found"; fi'
+```
+
+- If `APP_INSTALLED=false`, reopen `APP_URL/installer` and use the table above.
+- If `APP_INSTALLED=true` and every migration is complete, create a separate
+   recovery administrator interactively:
+
+   ```bash
+   docker exec -it pelican_panel php artisan p:user:make
+   ```
+
+   Answer yes when asked whether the user is an administrator. Use a fresh
+   email and username, and enter the password at the hidden prompt so it is not
+   stored in shell history. Log in with this account, then inspect the original
+   account under **Admin > Users**.
+- If migrations are incomplete, find and correct the first error in the output
+   above. Then finish the installer migration and verify its status before
+   creating the recovery administrator:
+
+   ```bash
+   docker exec pelican_panel php artisan migrate --force --seed
+   docker exec pelican_panel php artisan migrate:status
+   ```
+
+Do not manually change `APP_INSTALLED` back to `false` or rerun the full
+installer against a partially initialized database.
+
+### Configure the node and Wings
+
+Continue only after the first administrator can log out and back in. Add a node
+for this host, using the configured Wings API and SFTP ports.
 
 Save the generated node YAML as:
 
