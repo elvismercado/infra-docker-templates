@@ -1,6 +1,0 @@
-# Enable/Disable Watchtower
-
-services:
-  syncthing:
-    labels:
-      - "com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-false}"

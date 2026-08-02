@@ -23,9 +23,6 @@ docker compose -f docker-compose.yml -f docker-compose.legacy.yml up -d
 
 # WUD notifications and automatic LTS digest updates
 docker compose -f docker-compose.yml -f docker-compose.wud.yml up -d
-
-# Watchtower label (set WATCHTOWER_ENABLE=true first)
-docker compose -f docker-compose.yml -f docker-compose.watchtower.yml up -d
 ```
 
 The WUD overlay follows digest changes to the floating `lts` tag. It does not

@@ -7,7 +7,7 @@
 ## Conventions
 
 - Each service lives in its own directory with `docker-compose.yml` and optional `.env.example`
-- Optional integrations (Watchtower, WUD) use override files: `docker-compose.watchtower.yml`, `docker-compose.wud.yml`
+- Optional WUD integrations use `docker-compose.wud.yml` override files
 - All services use `restart: always`
 - Environment variables use `${VAR:-default}` pattern
 - Every service has a `com.service` label

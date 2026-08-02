@@ -453,12 +453,11 @@ Apply one optional override at deployment:
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.wud.yml up -d
-docker compose -f docker-compose.yml -f docker-compose.watchtower.yml up -d
 ```
 
 WUD watches digest changes for the exact mutable `vrising` tag and remains
-notification-only. Watchtower defaults to disabled and is less safe for this
-stateful server because it bypasses the backup-first update script.
+notification-only. Use the backup-first update script for controlled updates
+to this stateful server.
 
 ## Troubleshooting
 

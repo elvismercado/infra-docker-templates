@@ -1,6 +1,0 @@
-# Enable/Disable Watchtower
-
-services:
-  portainer:
-    labels:
-      - "com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-false}"

@@ -1,9 +1,0 @@
-# Enable/Disable Watchtower
-
-services:
-  vaultwarden:
-    labels:
-      - "com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-false}"
-  backvault:
-    labels:
-      - "com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-false}"

@@ -56,4 +56,3 @@ services:
       <<: *base-env
     labels:
       - "com.service=${CONTAINER_NAME:-linuxgsm-vhserver}"
-      - "com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-false}"

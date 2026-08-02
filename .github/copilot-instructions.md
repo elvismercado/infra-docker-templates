@@ -9,10 +9,10 @@
 ## Repo Conventions
 - This is a Docker Compose template repository for a homelab (Unraid server)
 - Each service lives in its own directory with `docker-compose.yml` and optional `.env.example`
-- Optional integrations use override files: `docker-compose.watchtower.yml`, `docker-compose.wud.yml`, etc.
+- Optional integrations use `docker-compose.wud.yml` override files where supported.
 - The `media/` stack is modular: services defined in subdirectory YAML files (e.g., `requests/seerr.yml`) and included via `extends:` in the main `docker-compose.yml`
 - Media stack uses `CONTAINER_NAME_PREFIX` (not `CONTAINER_NAME`) for container naming: `${CONTAINER_NAME_PREFIX:-media}-servicename`
-- Never put watchtower or WUD labels inline in the main compose — always use override files
+- Keep WUD labels in `docker-compose.wud.yml` override files rather than inline in the main compose.
 - All services use `restart: always` (not `unless-stopped`)
 - Environment variables use `${VAR:-default}` pattern throughout — no hardcoded values in environment blocks, even for compose-internal references like service names or ports
 - When making hardcoded values configurable via env vars, default to the upstream/official default — document recommended overrides for the user's setup in `.env.example`
@@ -40,8 +40,6 @@
 - When a service reads config from a file but needs values derived from compose env vars, use an entrypoint wrapper script that templates placeholders (e.g., `sed`) before exec-ing the original entrypoint — mount both the config template and wrapper as `:ro`
 
 ## Override Files
-- Watchtower: `docker-compose.watchtower.yml` — header `# Enable/Disable Watchtower`
-  - Label: `com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-false}`
 - WUD: `docker-compose.wud.yml` — header comment describing update strategy
   - Standard labels: `wud.watch=true`, `wud.tag.include=^\d+\.\d+\.\d+$$`
   - Auto-update minor/patch: `wud.trigger.include=smtp.gmail,docker.local:minor`

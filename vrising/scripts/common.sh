@@ -34,7 +34,6 @@ load_environment() {
     RUN_UID="${RUN_UID:-99}"
     GID="${GID:-100}"
     BACKUP_RETENTION="${BACKUP_RETENTION:-14}"
-    WATCHTOWER_ENABLE="${WATCHTOWER_ENABLE:-false}"
     WUD_ENABLE="${WUD_ENABLE:-false}"
     RCON_ENABLED="${RCON_ENABLED:-false}"
     RCON_HOST_ADDRESS="${RCON_HOST_ADDRESS:-127.0.0.1}"
@@ -51,9 +50,6 @@ load_environment() {
     # every script (setup/backup/restore/update) recreates the same container
     # configuration. Each overlay is appended only when its flag is enabled.
     COMPOSE_CMD=(docker compose --env-file "${ENV_FILE}" -f "${PROJECT_DIR}/docker-compose.yml")
-    if [ "${WATCHTOWER_ENABLE}" = "true" ] && [ -f "${PROJECT_DIR}/docker-compose.watchtower.yml" ]; then
-        COMPOSE_CMD+=(-f "${PROJECT_DIR}/docker-compose.watchtower.yml")
-    fi
     if [ "${WUD_ENABLE}" = "true" ] && [ -f "${PROJECT_DIR}/docker-compose.wud.yml" ]; then
         COMPOSE_CMD+=(-f "${PROJECT_DIR}/docker-compose.wud.yml")
     fi

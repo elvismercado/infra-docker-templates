@@ -55,4 +55,3 @@ services:
       - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-valheim_lloesche}/valheim_plus.env
     labels:
       - "com.service=${CONTAINER_NAME:-valheim_lloesche}"
-      - "com.centurylinklabs.watchtower.enable=${WATCHTOWER_ENABLE:-false}"
