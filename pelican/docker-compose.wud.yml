@@ -1,0 +1,27 @@
+# WUD (What's Up Docker?) labels
+# All Pelican services are notify-only so coordinated upgrades remain manual.
+
+services:
+  database:
+    labels:
+      - "wud.watch=true"
+      - "wud.tag.include=^10\\.11(\\.\\d+)?$$"
+      - "wud.trigger.include=smtp.gmail"
+
+  cache:
+    labels:
+      - "wud.watch=true"
+      - "wud.tag.include=^(\\d+\\.\\d+(\\.\\d+)?-)?alpine$$"
+      - "wud.trigger.include=smtp.gmail"
+
+  panel:
+    labels:
+      - "wud.watch=true"
+      - "wud.tag.include=^v1\\.0\\.0-beta\\d+$$"
+      - "wud.trigger.include=smtp.gmail"
+
+  wings:
+    labels:
+      - "wud.watch=true"
+      - "wud.tag.include=^v1\\.0\\.0-beta\\d+$$"
+      - "wud.trigger.include=smtp.gmail"

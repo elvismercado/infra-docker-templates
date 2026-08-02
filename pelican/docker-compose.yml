@@ -1,0 +1,133 @@
+# https://pelican.dev/
+# Pelican
+
+name: ${CONTAINER_NAME:-pelican}
+
+networks:
+  panel:
+    name: ${CONTAINER_NAME:-pelican}_panel
+    ipam:
+      config:
+        - subnet: ${PANEL_SUBNET:-10.42.0.0/24}
+  wings:
+    name: ${CONTAINER_NAME:-pelican}_wings
+    ipam:
+      config:
+        - subnet: ${WINGS_SUBNET:-10.42.1.0/24}
+
+services:
+  database:
+    image: mariadb:${MARIADB_VERSION:-10.11}
+    container_name: ${CONTAINER_NAME:-pelican}_database
+    hostname: ${CONTAINER_NAME:-pelican}_database
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - panel
+    volumes:
+      - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-pelican}/database:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-CHANGE_ME}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-CHANGE_ME}
+      MYSQL_DATABASE: ${DB_NAME:-panel}
+      MYSQL_USER: ${DB_USER:-pelican}
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    labels:
+      - "com.service=${CONTAINER_NAME:-pelican}_database"
+
+  cache:
+    image: redis:${REDIS_VERSION:-alpine}
+    container_name: ${CONTAINER_NAME:-pelican}_cache
+    hostname: ${CONTAINER_NAME:-pelican}_cache
+    restart: always
+    networks:
+      - panel
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    labels:
+      - "com.service=${CONTAINER_NAME:-pelican}_cache"
+
+  panel:
+    image: ghcr.io/pelican-dev/panel:${PANEL_VERSION:-v1.0.0-beta35}
+    container_name: ${CONTAINER_NAME:-pelican}_panel
+    hostname: ${CONTAINER_NAME:-pelican}_panel
+    restart: always
+    networks:
+      - panel
+    ports:
+      - ${PANEL_HTTP_PORT:-8080}:80
+    volumes:
+      - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-pelican}/panel/data:/pelican-data
+      - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-pelican}/panel/logs:/var/www/html/storage/logs
+      - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-pelican}/panel/plugins:/var/www/html/plugins
+    environment:
+      APP_URL: ${APP_URL:-http://localhost:8080}
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      MAIL_DRIVER: ${MAIL_DRIVER:-log}
+      XDG_DATA_HOME: ${XDG_DATA_HOME:-/pelican-data}
+      CACHE_STORE: ${CACHE_STORE:-redis}
+      SESSION_DRIVER: ${SESSION_DRIVER:-redis}
+      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-redis}
+      REDIS_HOST: ${REDIS_HOST:-cache}
+      DB_CONNECTION: ${DB_CONNECTION:-mariadb}
+      DB_HOST: ${DB_HOST:-database}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_DATABASE: ${DB_NAME:-panel}
+      DB_USERNAME: ${DB_USER:-pelican}
+      DB_PASSWORD: ${DB_PASSWORD:-CHANGE_ME}
+    depends_on:
+      database:
+        condition: service_healthy
+        restart: true
+      cache:
+        condition: service_healthy
+        restart: true
+    healthcheck:
+      test: ["CMD", "/bin/ash", "/healthcheck.sh"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    labels:
+      - "com.service=${CONTAINER_NAME:-pelican}_panel"
+
+  wings:
+    image: ghcr.io/pelican-dev/wings:${WINGS_VERSION:-v1.0.0-beta26}
+    container_name: ${CONTAINER_NAME:-pelican}_wings
+    hostname: ${CONTAINER_NAME:-pelican}_wings
+    profiles:
+      - wings
+    restart: always
+    tty: true
+    networks:
+      - wings
+    ports:
+      - ${WINGS_API_PORT:-8081}:8080
+      - ${WINGS_SFTP_PORT:-2022}:2022
+    environment:
+      TZ: ${TZ:-Europe/London}
+      WINGS_UID: ${UID:-1000}
+      WINGS_GID: ${GID:-1000}
+      WINGS_USERNAME: ${WINGS_USERNAME:-pelican}
+    volumes:
+      - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock
+      - ${DOCKER_CONTAINERS_PATH:-/var/lib/docker/containers}:/var/lib/docker/containers:ro
+      - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-pelican}/wings/config:/etc/pelican
+      - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-pelican}/wings:${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-pelican}/wings
+      - ${SSL_CERTS_PATH:-/etc/ssl/certs}:/etc/ssl/certs:ro
+    depends_on:
+      panel:
+        condition: service_healthy
+        restart: true
+    labels:
+      - "com.service=${CONTAINER_NAME:-pelican}_wings"
