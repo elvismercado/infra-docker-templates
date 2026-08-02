@@ -33,7 +33,7 @@ services:
       <<: *base-env
       NODE_ENV: production
     healthcheck:
-      test: ["CMD", "node", "/app/services/healthcheck"]
+      test: ["CMD", "node", "/app/services/healthcheck.js"]
       interval: 1m30s
       timeout: 10s
       retries: 3
