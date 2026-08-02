@@ -4,6 +4,9 @@ Docker-only Pelican deployment for an Unraid or Ubuntu Server host. The stack
 uses the official Pelican Panel and Wings images with MariaDB and Redis. It does
 not install Pelican packages or services directly on the host.
 
+For the YUNA Ansible deployment, see the
+[Pelican role runbook](https://github.com/elvismercado/infra-homelab/tree/main/roles/pelican).
+
 ## Architecture
 
 | Service | Purpose | Default host port |
@@ -26,7 +29,8 @@ These states are separate:
    or Panel's Caddy and PHP-FPM processes respond. Panel's Compose healthcheck
    is intentionally liveness-only so a new installation can reach `/installer`.
 2. **Panel installed:** `APP_INSTALLED=true`, all Laravel migrations have run,
-   and an administrator can log in and log out successfully.
+   required physical tables exist, a Root Admin relationship exists, and that
+   administrator can log in and log out successfully.
 3. **Node online:** Wings has started, can authenticate with Panel, and the
    node reports online in **Admin > Nodes**.
 
@@ -121,13 +125,20 @@ The commands below use the default `CONTAINER_NAME=pelican`. Adjust
 ```bash
 docker exec pelican_panel grep '^APP_INSTALLED=' /pelican-data/.env
 docker exec pelican_panel php artisan migrate:status
+docker exec pelican_panel supervisorctl -c /etc/supervisord.conf status
 docker logs --tail 200 pelican_panel
 docker exec pelican_panel sh -lc 'log=$(ls -1t /var/www/html/storage/logs/laravel-*.log 2>/dev/null | head -n 1); if [ -n "$log" ]; then tail -n 200 "$log"; else echo "No Laravel log found"; fi'
 ```
 
 - If `APP_INSTALLED=false`, reopen `APP_URL/installer` and use the table above.
-- If `APP_INSTALLED=true` and every migration is complete, create a separate
-   recovery administrator interactively:
+- If `APP_INSTALLED=true` and every migration is marked `Ran`, verify that the
+   physical core and permission tables still exist. At minimum, check `users`,
+   `nodes`, `eggs`, `egg_variables`, `database_hosts`, `databases`, `schedules`,
+   `user_ssh_keys`, and every table named by Pelican's
+   `permission.table_names` configuration. Migration status reflects the
+   migration ledger; it does not prove those tables exist.
+- If all required tables exist but no usable Root Admin remains, create a
+   separate recovery administrator interactively:
 
    ```bash
    docker exec -it pelican_panel php artisan p:user:make
@@ -137,14 +148,19 @@ docker exec pelican_panel sh -lc 'log=$(ls -1t /var/www/html/storage/logs/larave
    email and username, and enter the password at the hidden prompt so it is not
    stored in shell history. Log in with this account, then inspect the original
    account under **Admin > Users**.
-- If migrations are incomplete, find and correct the first error in the output
-   above. Then finish the installer migration and verify its status before
+- If migrations are genuinely pending, first create and restore-test a logical
+   MariaDB backup. Find and correct the first error in the output above, then
+   finish the migrations once and verify both status and physical tables before
    creating the recovery administrator:
 
    ```bash
    docker exec pelican_panel php artisan migrate --force --seed
    docker exec pelican_panel php artisan migrate:status
    ```
+- If required tables are absent while their migrations are marked `Ran`, do
+   not rerun migrations or edit the migration ledger. Restore a known-good
+   backup, repair an isolated database clone, or rebuild disposable state after
+   taking verified backups.
 
 Do not manually change `APP_INSTALLED` back to `false` or rerun the full
 installer against a partially initialized database.
@@ -186,17 +202,21 @@ In **Admin > Nodes**, create the first node with these values:
 | Port / daemon connection | The host-side `WINGS_API_PORT` value |
 | SFTP port | The host-side `WINGS_SFTP_PORT` value |
 | SFTP alias | Leave blank unless a separate display name is required |
-| Daemon base directory | The expanded `${VOLUMES_BASE}/${CONTAINER_NAME}/wings/volumes` path |
+| Daemon base directory | The expanded `${VOLUMES_BASE}/${CONTAINER_NAME}/wings` path |
 | Use for deployments | Yes |
 | Maintenance mode | Disabled |
 | Memory, disk, and CPU | Unlimited initially |
 | Upload limit | `256` or the default |
 
 For the YUNA Ansible deployment, use `192.168.40.2`, `HTTP`, port `8089`,
-SFTP port `2022`, and `/mnt/user/appdata/pelican/wings/volumes`. Do not use
+SFTP port `2022`, and `/mnt/user/appdata/pelican/wings`. Do not use
 the Panel HTTP port for the node connection port. The node connection port is
 the host-published Wings port; the Compose mapping forwards it to Wings'
 internal API listener.
+
+The daemon base is Wings' `system.root_directory`. Game-server files live in
+its `system.data` child, `/mnt/user/appdata/pelican/wings/volumes`; do not enter
+that child as the node's daemon base.
 
 Do not wait for the node to show as online before continuing. With the Wings
 profile disabled, nothing is listening on the configured API port yet, so an
