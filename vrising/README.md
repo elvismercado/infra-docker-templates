@@ -204,6 +204,51 @@ custom `ServerGameSettings.json`:
 	Changing these settings requires a server restart. Items that were created
 	before the change may retain their existing bound status, so test both existing
 	and newly acquired items after applying the configuration.
+
+	#### Ansible-managed PvE settings
+
+	The Ansible role exposes the following optional settings in the world vault.
+	They are merged into `ServerGameSettings.json` only when configured. Omitted
+	keys keep their current server values.
+
+	| Vault key | Native JSON key | Range or meaning |
+	| --- | --- | --- |
+	| `blood_bound_equipment` | `BloodBoundEquipment` | Boolean. Keep equipped armor and weapons on death. |
+	| `death_container_permission` | `DeathContainerPermission` | `0` Anyone, `1` ClanMembers, `2` OnlySelf. |
+	| `material_yield_modifier_global` | `MaterialYieldModifier_Global` | `0.25` through `3.0`. Resource yield multiplier. |
+	| `drop_table_modifier_general` | `DropTableModifier_General` | `0.25` through `3.0`. General loot multiplier. |
+	| `blood_essence_yield_modifier` | `BloodEssenceYieldModifier` | `0.25` through `3.0`. Blood Essence yield multiplier. |
+	| `craft_rate_modifier` | `CraftRateModifier` | `0.25` through `6.0`. Crafting speed multiplier. |
+	| `refinement_rate_modifier` | `RefinementRateModifier` | `0.25` through `6.0`. Refinement speed multiplier. |
+	| `servant_convert_rate_modifier` | `ServantConvertRateModifier` | `0.25` through `6.0`. Servant conversion speed multiplier. |
+	| `repair_cost_modifier` | `RepairCostModifier` | `0.0` through `3.0`. Repair cost multiplier. |
+	| `durability_drain_modifier` | `DurabilityDrainModifier` | `0.0` through `3.0`. Normal durability drain multiplier. |
+	| `castle_relocation_enabled` | `CastleRelocationEnabled` | Boolean. Enable Castle Relocation. |
+	| `castle_blood_essence_drain_modifier` | `CastleBloodEssenceDrainModifier` | `0.0` through `3.0`. Castle upkeep multiplier. |
+	| `castle_decay_rate_modifier` | `CastleDecayRateModifier` | `0.0` through `3.0`. Unpowered castle decay multiplier. |
+	| `inactivity_kill_enabled` | `InactivityKillEnabled` | Boolean. Enable automatic inactive-player removal. |
+
+	For the selected shorter-day profile, configure:
+
+	```yaml
+	game_time_modifiers:
+	  day_start_hour: 10
+	  day_start_minute: 0
+	  day_end_hour: 16
+	  day_end_minute: 0
+	```
+
+	This changes daylight to `10:00-16:00`, leaving an 18-hour in-game night.
+	`DayDurationInSeconds` is intentionally unchanged, as are existing Blood Moon
+	fields and other unknown `GameTimeModifiers` children. The role merges these
+	nested values recursively and restarts the server only when the resulting JSON
+	differs. Custom gameplay settings require `game_settings_preset: ""`.
+
+	The Yuna profile uses `DeathContainerPermission: 2`, so only the owner can loot
+	the death container. `BloodBoundEquipment: true` separately keeps equipped gear
+	on death. The requested `0.1` durability and castle modifiers are substantial
+	reductions: equipment loses durability slowly, powered castles consume little
+	Blood Essence, and unpowered castles decay slowly.
 4. Start the container.
 
 The clan-size setting is separate from `MAX_CONNECTED_USERS`. A clan may be
