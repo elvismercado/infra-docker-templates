@@ -137,11 +137,60 @@ installer against a partially initialized database.
 Continue only after the first administrator can log out and back in. Add a node
 for this host, using the configured Wings API and SFTP ports.
 
-Save the generated node YAML as:
+In **Admin > Nodes**, create the first node with these values:
+
+| Field | Value |
+| --- | --- |
+| Name | A descriptive name for this host |
+| FQDN / IP address | The host address reachable by the Panel |
+| Connection | `HTTP` for direct HTTP, or the configured HTTPS option |
+| Port / daemon connection | The host-side `WINGS_API_PORT` value |
+| SFTP port | The host-side `WINGS_SFTP_PORT` value |
+| SFTP alias | Leave blank unless a separate display name is required |
+| Daemon base directory | The expanded `${VOLUMES_BASE}/${CONTAINER_NAME}/wings/volumes` path |
+| Use for deployments | Yes |
+| Maintenance mode | Disabled |
+| Memory, disk, and CPU | Unlimited initially |
+| Upload limit | `256` or the default |
+
+For the YUNA Ansible deployment, use `192.168.40.2`, `HTTP`, port `8089`,
+SFTP port `2022`, and `/mnt/user/appdata/pelican/wings/volumes`. Do not use
+the Panel HTTP port for the node connection port. The node connection port is
+the host-published Wings port; the Compose mapping forwards it to Wings'
+internal API listener.
+
+Do not wait for the node to show as online before continuing. With the Wings
+profile disabled, nothing is listening on the configured API port yet, so an
+offline or unreachable node is expected. Creating the node and copying its
+generated configuration is the prerequisite for enabling the Wings profile.
+
+After Wings starts, the Panel must reach the host-side Wings API port, and
+Wings must reach the Panel URL in its generated `remote` value. If the node
+remains offline after startup, check the Wings logs and the host firewall or
+port-forwarding rules.
+
+Save the complete generated node YAML from the node's **Configuration File**
+tab as:
 
 ```text
 /mnt/user/appdata/pelican/wings/config/config.yml
 ```
+
+When Ansible manages this deployment, store the same complete document in the
+encrypted vault as a YAML literal block under `pelican_config.wings_config`.
+The `|` makes the value a multiline string that the role parses before writing
+`config.yml`. Do not paste the generated fields as a nested mapping under
+`wings_config`, wrap the document in quotes, or include Markdown code fences:
+
+```yaml
+pelican_config:
+   wings_enabled: true
+   wings_config: |
+      <paste the complete Panel-generated YAML here, preserving its indentation>
+```
+
+The placeholder is illustrative only. Include every generated section and
+credential in the actual encrypted vault value.
 
 Before enabling Wings, change every generated `system` storage path used by
 game containers to a location below:
@@ -160,9 +209,8 @@ Set `COMPOSE_PROFILES=wings`, then start the complete stack:
 docker compose --profile wings up -d
 ```
 
-When Ansible manages this deployment, store the complete generated YAML in the
-encrypted YUNA vault instead of writing it manually. The Pelican role applies
-the YUNA storage and game-network settings before enabling the profile.
+When Ansible manages this deployment, the Pelican role applies the YUNA
+storage and game-network settings before enabling the profile.
 
 ## WUD
 
