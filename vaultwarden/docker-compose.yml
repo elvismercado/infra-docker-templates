@@ -4,30 +4,30 @@
 # This setup is for running in my Unraid server
 
 x-base-env: &base-env
-  PUID: ${UID}
-  PGID: ${GID}
-  UID: ${UID}
-  GID: ${GID}
+  PUID: ${UID:-99}
+  PGID: ${GID:-100}
+  UID: ${UID:-99}
+  GID: ${GID:-100}
   UMASK: ${UMASK:-022}
   TZ: ${TZ:-Europe/London}
 
 # https://github.com/dani-garcia/vaultwarden/wiki/SMTP-Configuration
 x-smtp: &smtp
   SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
-  SMTP_FROM: ${SMTP_FROM}
+  SMTP_FROM: ${SMTP_FROM:-}
   SMTP_FROM_NAME: ${SMTP_FROM_NAME:-Vaultwarden}
-  SMTP_USERNAME: ${SMTP_USERNAME}
-  SMTP_PASSWORD: ${SMTP_PASSWORD}
+  SMTP_USERNAME: ${SMTP_USERNAME:-}
+  SMTP_PASSWORD: ${SMTP_PASSWORD:-}
   SMTP_SECURITY: ${SMTP_SECURITY:-starttls}
   SMTP_PORT: ${SMTP_PORT:-587}
 
 # https://github.com/dani-garcia/vaultwarden/wiki/Enabling-Mobile-Client-push-notification
 x-push: &push
-  PUSH_ENABLED: true
-  PUSH_INSTALLATION_ID: ${PUSH_INSTALLATION_ID}
-  PUSH_INSTALLATION_KEY: ${PUSH_INSTALLATION_KEY}
-  PUSH_RELAY_URI: https://push.bitwarden.eu
-  PUSH_IDENTITY_URI: https://identity.bitwarden.eu
+  PUSH_ENABLED: ${PUSH_ENABLED:-false}
+  PUSH_INSTALLATION_ID: ${PUSH_INSTALLATION_ID:-}
+  PUSH_INSTALLATION_KEY: ${PUSH_INSTALLATION_KEY:-}
+  PUSH_RELAY_URI: ${PUSH_RELAY_URI:-https://push.bitwarden.com}
+  PUSH_IDENTITY_URI: ${PUSH_IDENTITY_URI:-https://identity.bitwarden.com}
 
 name: ${CONTAINER_NAME:-vaultwarden}
 
@@ -70,25 +70,25 @@ services:
       # DOMAIN=https://vw.domain.tld:8443
       ## For public server (URL with path)
       # DOMAIN=https://domain.tld/vw
-      DOMAIN: ${DOMAIN}
+      DOMAIN: ${DOMAIN:-}
 
       ## Controls whether users are allowed to create Bitwarden Sends.
       ## This setting applies globally to all users.
       ## To control this on a per-org basis instead, use the "Disable Send" org policy.
-      SENDS_ALLOWED: true
+      SENDS_ALLOWED: ${SENDS_ALLOWED:-true}
 
       ## HIBP Api Key
       ## HaveIBeenPwned API Key, request it here: https://haveibeenpwned.com/API/Key
-      HIBP_API_KEY: ${HIBP_API_KEY}
+      HIBP_API_KEY: ${HIBP_API_KEY:-}
 
-      ORG_ATTACHMENT_LIMIT: 97280 # KB - Cloudflare has a 100MB stream limit - setting this to 95MB
-      USER_ATTACHMENT_LIMIT: 97280 # KB - Cloudflare has a 100MB stream limit - setting this to 95MB
-      USER_SEND_LIMIT: 97280 # KB - Cloudflare has a 100MB stream limit - setting this to 95MB
+      ORG_ATTACHMENT_LIMIT: ${ORG_ATTACHMENT_LIMIT:-97280} # KB - Cloudflare has a 100MB stream limit - setting this to 95MB
+      USER_ATTACHMENT_LIMIT: ${USER_ATTACHMENT_LIMIT:-97280} # KB - Cloudflare has a 100MB stream limit - setting this to 95MB
+      USER_SEND_LIMIT: ${USER_SEND_LIMIT:-97280} # KB - Cloudflare has a 100MB stream limit - setting this to 95MB
       
       ## Number of days to wait before auto-deleting a trashed item.
       ## If unset (the default), trashed items are not auto-deleted.
       ## This setting applies globally, so make sure to inform all users of any changes to this setting.
-      TRASH_AUTO_DELETE_DAYS: 30
+      TRASH_AUTO_DELETE_DAYS: ${TRASH_AUTO_DELETE_DAYS:-30}
 
       ## Controls if new users can register
       SIGNUPS_ALLOWED: ${SIGNUPS_ALLOWED:-false} # set to true if its first time setting up bitwarden
@@ -98,38 +98,30 @@ services:
       ## On older clients, it will require the user to verify their email before they can log in.
       ## The welcome email will include a verification link, and login attempts will periodically
       ## trigger another verification email to be sent.
-      SIGNUPS_VERIFY: true
+      SIGNUPS_VERIFY: ${SIGNUPS_VERIFY:-true}
 
       ## Allows org admins to invite users, even when signups are disabled
-      INVITATIONS_ALLOWED: false
+      INVITATIONS_ALLOWED: ${INVITATIONS_ALLOWED:-false}
       ## Name shown in the invitation emails that don't come from a specific organization
       INVITATION_ORG_NAME: ${INVITATION_ORG_NAME:-Vaultwarden}
 
       ## Number of server-side passwords hashing iterations for the password hash.
       ## The default for new users. If changed, it will be updated during login for existing users.
-      PASSWORD_ITERATIONS: 1200000
+      PASSWORD_ITERATIONS: ${PASSWORD_ITERATIONS:-1200000}
 
       ## Enable experimental feature flags for clients.
       ## This is a comma-separated list of flags, e.g. "flag1,flag2,flag3".
       ## Note that clients cache the /api/config endpoint for about 1 hour and it could take some time before they are enabled or disabled!
-      ##
-      ## The following flags are available:
-      ## - "inline-menu-positioning-improvements": Enable the use of inline menu password generator and identity suggestions in the browser extension.
-      ## - "inline-menu-totp": Enable the use of inline menu TOTP codes in the browser extension.
-      ## - "ssh-agent": Enable SSH agent support on Desktop. (Needs desktop >=2024.12.0)
-      ## - "ssh-key-vault-item": Enable the creation and use of SSH key vault items. (Needs clients >=2024.12.0)
-      ## - "export-attachments": Enable support for exporting attachments (Clients >=2025.4.0)
-      ## - "anon-addy-self-host-alias": Enable configuring self-hosted Anon Addy alias generator. (Needs Android >=2025.3.0, iOS >=2025.4.0)
-      ## - "simple-login-self-host-alias": Enable configuring self-hosted Simple Login alias generator. (Needs Android >=2025.3.0, iOS >=2025.4.0)
-      ## - "mutual-tls": Enable the use of mutual TLS on Android (Client >= 2025.2.0)
-      EXPERIMENTAL_CLIENT_FEATURE_FLAGS: inline-menu-positioning-improvements,inline-menu-totp,export-attachments,anon-addy-self-host-alias,simple-login-self-host-alias
+      ## See the current upstream .env.template for the supported flags:
+      ## https://github.com/dani-garcia/vaultwarden/blob/main/.env.template
+      EXPERIMENTAL_CLIENT_FEATURE_FLAGS: ${EXPERIMENTAL_CLIENT_FEATURE_FLAGS:-}
 
       ## Require new device emails. When a user logs in an email is required to be sent.
       ## If sending the email fails the login attempt will fail!!
-      REQUIRE_DEVICE_EMAIL: true
+      REQUIRE_DEVICE_EMAIL: ${REQUIRE_DEVICE_EMAIL:-true}
 
       ## Enable extended logging, which shows timestamps and targets in the logs
-      EXTENDED_LOGGING: false
+      EXTENDED_LOGGING: ${EXTENDED_LOGGING:-false}
 
       ## Token for the admin interface, preferably an Argon2 PCH string
       ## Vaultwarden has a built-in generator by calling `vaultwarden hash`
@@ -141,7 +133,7 @@ services:
       # ADMIN_TOKEN='$argon2id$v=19$m=65540,t=3,p=4$MmeKRnGK5RW5mJS7h3TOL89GrpLPXJPAtTK8FTqj9HM$DqsstvoSAETl9YhnsXbf43WeaUwJC6JhViIvuPoig78'
       ## Old plain text string (Will generate warnings in favor of Argon2)
       # ADMIN_TOKEN=Vy2VyYTTsKPv8W5aEOWUbB/Bt3DEKePbHmI4m9VcemUMS2rEviDowNAFqYi1xjmp
-      ADMIN_TOKEN: ${ADMIN_TOKEN}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
     labels:
       - "com.service=${CONTAINER_NAME:-vaultwarden}"
 
@@ -166,10 +158,10 @@ services:
       - ${BACKVAULT_PORT:-8081}:8080
     environment:
       <<: *base-env
-      BW_SERVER: http://${CONTAINER_NAME:-vaultwarden}:80
+      BW_SERVER: ${BACKVAULT_SERVER:-http://vaultwarden:80}
       BACKUP_ENCRYPTION_MODE: ${BACKUP_ENCRYPTION_MODE:-raw}
       BACKUP_INTERVAL_HOURS: ${BACKUP_INTERVAL_HOURS:-12}
       RETAIN_DAYS: ${RETAIN_DAYS:-30}
-      NODE_TLS_REJECT_UNAUTHORIZED: 0
+      NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-1}
     labels:
       - "com.service=${CONTAINER_NAME:-vaultwarden}-backup"

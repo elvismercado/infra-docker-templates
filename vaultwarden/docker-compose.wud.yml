@@ -1,13 +1,15 @@
-# WUD (What's Up Docker?) labels — notify + auto-update (minor/patch only)
+# WUD watches floating tags by digest and automatically applies each new image.
 
 services:
   vaultwarden:
     labels:
       - "wud.watch=true"
+      - "wud.watch.digest=true"
       - "wud.tag.include=^\\d+\\.\\d+\\.\\d+$$"
-      - "wud.trigger.include=smtp.gmail,docker.local:minor"
+      - "wud.trigger.include=smtp.gmail,docker.local"
   backvault:
     labels:
       - "wud.watch=true"
+      - "wud.watch.digest=true"
       - "wud.tag.include=^\\d+\\.\\d+\\.\\d+$$"
-      - "wud.trigger.include=smtp.gmail,docker.local:minor"
+      - "wud.trigger.include=smtp.gmail,docker.local"
