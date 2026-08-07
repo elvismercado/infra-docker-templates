@@ -227,6 +227,9 @@ custom `ServerGameSettings.json`:
 	| `castle_blood_essence_drain_modifier` | `CastleBloodEssenceDrainModifier` | `0.0` through `3.0`. Castle upkeep multiplier. |
 	| `castle_decay_rate_modifier` | `CastleDecayRateModifier` | `0.0` through `3.0`. Unpowered castle decay multiplier. |
 	| `inactivity_kill_enabled` | `InactivityKillEnabled` | Boolean. Enable automatic inactive-player removal. |
+	| `war_event_game_settings.interval` | `WarEventGameSettings.Interval` | `1` Minimum (30m), `2` VeryShort (1h), `3` Short (1h30m), `4` Medium (2h), `5` Long (4h), `6` VeryLong (8h), `7` Extensive (12h), `8` Maximum (24h). |
+	| `war_event_game_settings.major_duration` | `WarEventGameSettings.MajorDuration` | `0` Minimum (15m), `1` VeryShort (20m), `2` Short (25m), `3` Medium (30m), `4` Long (35m), `5` VeryLong (45m), `6` Extensive (1h), `7` Maximum (2h). |
+	| `war_event_game_settings.minor_duration` | `WarEventGameSettings.MinorDuration` | Uses the same duration enum as `major_duration`. |
 
 	For the selected shorter-day profile, configure:
 
@@ -243,6 +246,19 @@ custom `ServerGameSettings.json`:
 	fields and other unknown `GameTimeModifiers` children. The role merges these
 	nested values recursively and restarts the server only when the resulting JSON
 	differs. Custom gameplay settings require `game_settings_preset: ""`.
+
+	The Yuna profile keeps Rift Incursions frequent and extends their active time:
+
+	```yaml
+	war_event_game_settings:
+	  interval: 1
+	  major_duration: 5
+	  minor_duration: 3
+	```
+
+	This selects a 30-minute interval, 45-minute major events, and 30-minute minor
+	events. These values are enum indexes, not literal minute counts. Other
+	`WarEventGameSettings` children are preserved by the recursive merge.
 
 	The Yuna profile uses `DeathContainerPermission: 2`, so only the owner can loot
 	the death container. `BloodBoundEquipment: true` separately keeps equipped gear

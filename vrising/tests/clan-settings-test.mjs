@@ -48,6 +48,21 @@ const currentSettings = {
       preserved: true,
     },
   },
+  WarEventGameSettings: {
+    Interval: 4,
+    MajorDuration: 1,
+    MinorDuration: 1,
+    PointsModifier: 1,
+    WeekdayTime: {
+      StartHour: 18,
+      StartMinute: 0,
+      EndHour: 23,
+      EndMinute: 59,
+    },
+    UnknownFutureSetting: {
+      preserved: true,
+    },
+  },
   nested: {
     preserve: true,
   },
@@ -146,6 +161,21 @@ const mergeGameplaySettings = (settings, options) => {
     };
   }
 
+  if (options.war_event_game_settings !== undefined) {
+    mergedSettings.WarEventGameSettings = {
+      ...settings.WarEventGameSettings,
+      ...(options.war_event_game_settings.interval === undefined
+        ? {}
+        : { Interval: Number.parseInt(options.war_event_game_settings.interval, 10) }),
+      ...(options.war_event_game_settings.major_duration === undefined
+        ? {}
+        : { MajorDuration: Number.parseInt(options.war_event_game_settings.major_duration, 10) }),
+      ...(options.war_event_game_settings.minor_duration === undefined
+        ? {}
+        : { MinorDuration: Number.parseInt(options.war_event_game_settings.minor_duration, 10) }),
+    };
+  }
+
   return mergedSettings;
 };
 
@@ -201,6 +231,11 @@ const requestedGameplaySettings = mergeGameplaySettings(currentSettings, {
     day_end_hour: 16,
     day_end_minute: 0,
   },
+  war_event_game_settings: {
+    interval: 1,
+    major_duration: 5,
+    minor_duration: 3,
+  },
 });
 assert.equal(requestedGameplaySettings.BloodBoundEquipment, true);
 assert.equal(requestedGameplaySettings.DeathContainerPermission, 2);
@@ -220,6 +255,12 @@ assert.equal(requestedGameplaySettings.GameTimeModifiers.DayStartHour, 10);
 assert.equal(requestedGameplaySettings.GameTimeModifiers.DayStartMinute, 0);
 assert.equal(requestedGameplaySettings.GameTimeModifiers.DayEndHour, 16);
 assert.equal(requestedGameplaySettings.GameTimeModifiers.DayEndMinute, 0);
+assert.equal(requestedGameplaySettings.WarEventGameSettings.Interval, 1);
+assert.equal(requestedGameplaySettings.WarEventGameSettings.MajorDuration, 5);
+assert.equal(requestedGameplaySettings.WarEventGameSettings.MinorDuration, 3);
+assert.equal(typeof requestedGameplaySettings.WarEventGameSettings.Interval, 'number');
+assert.equal(typeof requestedGameplaySettings.WarEventGameSettings.MajorDuration, 'number');
+assert.equal(typeof requestedGameplaySettings.WarEventGameSettings.MinorDuration, 'number');
 assert.equal(typeof requestedGameplaySettings.MaterialYieldModifier_Global, 'number');
 assert.equal(typeof requestedGameplaySettings.DropTableModifier_General, 'number');
 assert.equal(typeof requestedGameplaySettings.RepairCostModifier, 'number');
@@ -232,6 +273,18 @@ assert.deepEqual(
   requestedGameplaySettings.GameTimeModifiers.UnknownFutureSetting,
   currentSettings.GameTimeModifiers.UnknownFutureSetting,
 );
+assert.equal(
+  requestedGameplaySettings.WarEventGameSettings.PointsModifier,
+  currentSettings.WarEventGameSettings.PointsModifier,
+);
+assert.deepEqual(
+  requestedGameplaySettings.WarEventGameSettings.WeekdayTime,
+  currentSettings.WarEventGameSettings.WeekdayTime,
+);
+assert.deepEqual(
+  requestedGameplaySettings.WarEventGameSettings.UnknownFutureSetting,
+  currentSettings.WarEventGameSettings.UnknownFutureSetting,
+);
 assert.deepEqual(
   mergeGameplaySettings(requestedGameplaySettings, {
     game_time_modifiers: {
@@ -239,6 +292,11 @@ assert.deepEqual(
       day_start_minute: 0,
       day_end_hour: 16,
       day_end_minute: 0,
+    },
+    war_event_game_settings: {
+      interval: 1,
+      major_duration: 5,
+      minor_duration: 3,
     },
   }),
   requestedGameplaySettings,
@@ -249,6 +307,9 @@ const partialGameplaySettings = mergeGameplaySettings(currentSettings, {
   game_time_modifiers: {
     day_start_hour: 10,
   },
+  war_event_game_settings: {
+    major_duration: 5,
+  },
 });
 assert.equal(partialGameplaySettings.BloodBoundEquipment, true);
 assert.equal(partialGameplaySettings.DeathContainerPermission, currentSettings.DeathContainerPermission);
@@ -257,6 +318,10 @@ assert.equal(partialGameplaySettings.GameTimeModifiers.DayEndHour, currentSettin
 assert.equal(partialGameplaySettings.GameTimeModifiers.DayEndMinute, currentSettings.GameTimeModifiers.DayEndMinute);
 assert.equal(partialGameplaySettings.GameTimeModifiers.DayDurationInSeconds, currentSettings.GameTimeModifiers.DayDurationInSeconds);
 assert.equal(partialGameplaySettings.GameTimeModifiers.BloodMoonBuff, currentSettings.GameTimeModifiers.BloodMoonBuff);
+assert.equal(partialGameplaySettings.WarEventGameSettings.Interval, currentSettings.WarEventGameSettings.Interval);
+assert.equal(partialGameplaySettings.WarEventGameSettings.MajorDuration, 5);
+assert.equal(partialGameplaySettings.WarEventGameSettings.MinorDuration, currentSettings.WarEventGameSettings.MinorDuration);
+assert.deepEqual(partialGameplaySettings.WarEventGameSettings.WeekdayTime, currentSettings.WarEventGameSettings.WeekdayTime);
 
 const partialTravelSettings = mergeTravelSettings(currentSettings, {
   teleport_with_items: true,
