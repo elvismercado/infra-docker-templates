@@ -188,10 +188,11 @@ custom `ServerGameSettings.json`:
 	The Ansible role exposes positive vault settings for these native flags:
 
 	```yaml
+	game_settings_preset: ""
+	game_mode_type: PvE
 	teleport_with_items: true
 	bat_form_with_items: true
 	bat_form_with_soul_shards: true
-	game_settings_preset: ""
 	```
 
 	A configured `true` value maps to the corresponding native `false` value
