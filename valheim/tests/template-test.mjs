@@ -9,12 +9,16 @@ const readProjectFile = (name) => fs.readFileSync(path.join(projectDirectory, na
 
 const composeFile = readProjectFile('docker-compose.yml');
 assert.match(composeFile, /ghcr\.io\/community-valheim-tools\/valheim-server/);
+assert.match(composeFile, /name: \$\{NETWORK_NAME:-\$\{CONTAINER_NAME:-valheim\}\}/);
 assert.match(composeFile, /\$\{APP_DATA_PATH:-\/tmp\/valheim\}\/valheim-server\/config:\/config/);
 assert.match(composeFile, /\$\{APP_DATA_PATH:-\/tmp\/valheim\}\/valheim-server\/data:\/opt\/valheim/);
 assert.match(composeFile, /stop_grace_period: 2m/);
 assert.match(composeFile, /supervisorctl status valheim-server \| grep -q RUNNING/);
 assert.doesNotMatch(composeFile, /:9001\/tcp/);
 assert.doesNotMatch(composeFile, /:80\/tcp/);
+
+const composeEnvironment = readProjectFile('.env.example');
+assert.match(composeEnvironment, /^NETWORK_NAME=valheim$/m);
 
 const statusOverlay = readProjectFile('docker-compose.status.yml');
 assert.match(statusOverlay, /\$\{STATUS_PORT:-2454\}:80\/tcp/);

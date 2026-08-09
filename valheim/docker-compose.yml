@@ -2,7 +2,7 @@ name: ${CONTAINER_NAME:-valheim}
 
 networks:
   default:
-    name: ${CONTAINER_NAME:-valheim}
+    name: ${NETWORK_NAME:-${CONTAINER_NAME:-valheim}}
     ipam:
       config:
         - subnet: ${SUBNET:-10.42.0.0/24}

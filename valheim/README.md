@@ -63,7 +63,17 @@ and app-data directory:
 container_name: valheim_lloesche1
 app_dir_name: valheim_lloesche1
 volumes_base: /mnt/user/appdata
+network_name: valheim_lloesche
+subnet: 10.42.64.0/24
+status_port: 2460
 ```
+
+The network name and subnet deliberately match the existing lloesche
+deployment. Docker cannot create a second network with a different name on the
+same subnet. Do not delete `valheim_lloesche` or change its subnet during the
+migration. Keeping status on host port `2460` preserves the existing monitoring
+endpoint; the legacy Supervisor port `2459` closes because Supervisor is
+disabled in the new configuration.
 
 The maintained image is a drop-in successor to the lloesche image. It mounts
 the existing world from:
@@ -100,8 +110,12 @@ After backing up the existing configuration, verify the backup and set
 `valheim_world1_config.migration_backup_confirmed` to `true`. Do not enable the flag before
 the backup has been verified.
 
-The dedicated playbook checks that the expected world `.db` and `.fwl` files exist and are
-regular files before running the role, preventing deployment from initializing the wrong world.
+The dedicated playbook checks that the expected world `.db` and `.fwl` files
+exist and are regular files before running the role. It also requires the
+existing network to have the expected subnet and Compose labels, and requires
+the running container to use that network and the expected `/config` and
+`/opt/valheim` mounts. The role renders the complete Compose model before it
+replaces the container.
 
 Deploy after the preflight succeeds:
 
@@ -109,6 +123,10 @@ Deploy after the preflight succeeds:
 cd /path/to/infra-homelab
 ./runscripts/run-playbook.sh yuna valheim
 ```
+
+After an `invalid pool request` from an earlier migration attempt, no network
+cleanup is needed: the old container and `valheim_lloesche` network remain in
+use. Pull the corrected repositories and rerun the same dedicated playbook.
 
 The first startup can take several minutes while SteamCMD updates the server.
 Confirm container health, inspect logs, join the expected world, verify admin
