@@ -1,0 +1,4 @@
+services:
+  valheim:
+    ports:
+      - "${SUPERVISOR_PORT:-2455}:9001/tcp"

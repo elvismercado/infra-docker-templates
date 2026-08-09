@@ -1,0 +1,37 @@
+name: ${CONTAINER_NAME:-valheim}
+
+networks:
+  default:
+    name: ${CONTAINER_NAME:-valheim}
+    ipam:
+      config:
+        - subnet: ${SUBNET:-10.42.0.0/24}
+
+services:
+  valheim:
+    image: ${IMAGE_REPOSITORY:-ghcr.io/community-valheim-tools/valheim-server}:${IMAGE_VERSION:-latest}
+    container_name: ${CONTAINER_NAME:-valheim}
+    hostname: ${CONTAINER_NAME:-valheim}
+    cap_add:
+      - SYS_NICE
+    restart: always
+    stop_grace_period: 2m
+    networks:
+      - default
+    ports:
+      - "${GAME_PORT:-2456}:2456/udp"
+      - "${QUERY_PORT:-2457}:2457/udp"
+      - "${RPC_PORT:-2458}:2458/udp"
+    volumes:
+      - ${APP_DATA_PATH:-/tmp/valheim}/valheim-server/config:/config
+      - ${APP_DATA_PATH:-/tmp/valheim}/valheim-server/data:/opt/valheim
+    env_file:
+      - ${SERVER_ENV_FILE:-valheim.env}
+    healthcheck:
+      test: ["CMD-SHELL", "supervisorctl status valheim-server | grep -q RUNNING"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20m
+    labels:
+      - "com.service=${CONTAINER_NAME:-valheim}"

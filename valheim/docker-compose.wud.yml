@@ -1,0 +1,6 @@
+services:
+  valheim:
+    labels:
+      - "wud.watch=true"
+      - "wud.watch.digest=true"
+      - "wud.trigger.include=smtp.gmail"

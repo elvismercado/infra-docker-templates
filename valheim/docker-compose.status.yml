@@ -1,0 +1,4 @@
+services:
+  valheim:
+    ports:
+      - "${STATUS_PORT:-2454}:80/tcp"
