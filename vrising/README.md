@@ -213,6 +213,7 @@ custom `ServerGameSettings.json`:
 
 	| Vault key | Native JSON key | Range or meaning |
 	| --- | --- | --- |
+	| `game_mode_type` | `GameModeType` | `PvE` disables player-versus-player combat; `PvP` enables it. |
 	| `blood_bound_equipment` | `BloodBoundEquipment` | Boolean. Keep equipped armor and weapons on death. |
 	| `death_container_permission` | `DeathContainerPermission` | `0` Anyone, `1` ClanMembers, `2` OnlySelf. |
 	| `material_yield_modifier_global` | `MaterialYieldModifier_Global` | `0.25` through `3.0`. Resource yield multiplier. |
@@ -230,6 +231,11 @@ custom `ServerGameSettings.json`:
 	| `war_event_game_settings.interval` | `WarEventGameSettings.Interval` | `1` Minimum (30m), `2` VeryShort (1h), `3` Short (1h30m), `4` Medium (2h), `5` Long (4h), `6` VeryLong (8h), `7` Extensive (12h), `8` Maximum (24h). |
 	| `war_event_game_settings.major_duration` | `WarEventGameSettings.MajorDuration` | `0` Minimum (15m), `1` VeryShort (20m), `2` Short (25m), `3` Medium (30m), `4` Long (35m), `5` VeryLong (45m), `6` Extensive (1h), `7` Maximum (2h). |
 	| `war_event_game_settings.minor_duration` | `WarEventGameSettings.MinorDuration` | Uses the same duration enum as `major_duration`. |
+
+	The Yuna profile sets `game_mode_type: PvE` explicitly so a stale PvP value
+	in the existing custom settings file cannot survive the recursive merge. The
+	role applies the changed JSON while the server is stopped and restarts it
+	before verifying the persisted value.
 
 	For the selected shorter-day profile, configure:
 

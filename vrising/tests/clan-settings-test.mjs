@@ -99,6 +99,9 @@ const mergeTravelSettings = (settings, options) => ({
 const mergeGameplaySettings = (settings, options) => {
   const mergedSettings = {
     ...mergeTravelSettings(settings, options),
+    ...(options.game_mode_type === undefined
+      ? {}
+      : { GameModeType: options.game_mode_type }),
     ...(options.blood_bound_equipment === undefined
       ? {}
       : { BloodBoundEquipment: Boolean(options.blood_bound_equipment) }),
@@ -206,6 +209,23 @@ const mixedTravelSettings = mergeTravelSettings(currentSettings, {
 assert.equal(mixedTravelSettings.TeleportBoundItems, true);
 assert.equal(mixedTravelSettings.BatBoundItems, true);
 assert.equal(mixedTravelSettings.BatBoundShards, true);
+
+const currentPvpSettings = {
+  ...currentSettings,
+  GameModeType: 'PvP',
+};
+const requestedPveSettings = mergeGameplaySettings(currentPvpSettings, {
+  game_mode_type: 'PvE',
+});
+assert.equal(requestedPveSettings.GameModeType, 'PvE');
+assert.equal(typeof requestedPveSettings.GameModeType, 'string');
+assert.equal(requestedPveSettings.CastleDamageMode, currentPvpSettings.CastleDamageMode);
+assert.deepEqual(requestedPveSettings.nested, currentPvpSettings.nested);
+assert.deepEqual(
+  mergeGameplaySettings(requestedPveSettings, { game_mode_type: 'PvE' }),
+  requestedPveSettings,
+);
+assert.equal(mergeGameplaySettings(currentPvpSettings, {}).GameModeType, 'PvP');
 
 const requestedGameplaySettings = mergeGameplaySettings(currentSettings, {
   teleport_with_items: true,
