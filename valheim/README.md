@@ -177,6 +177,22 @@ ValheimPlus configuration under `/config/valheimplus` is preserved and is not
 rewritten during migration. ValheimPlus generally requires compatible client
 mods.
 
+For the Yuna server, keep the Windows Steam client on the default public branch
+and install the pinned ValheimPlus `0.9.17.1` client manually:
+
+1. In Steam, open Valheim's **Properties**, select **Installed Files**, and use
+   **Browse** to open `steamapps/common/Valheim`.
+2. Download `WindowsClient.zip` from the Grantapher ValheimPlus `0.9.17.1`
+   release.
+3. Extract the archive and copy its contents into the Valheim game folder,
+   overwriting existing files. The client archive includes the compatible
+   BepInExPack, so a separate BepInEx installation is not required.
+4. Start Valheim normally through Steam and confirm the title screen reports
+   BepInEx and ValheimPlus `0.9.17.1` before connecting.
+
+Steam file verification can remove or replace mod files. Repeat the client
+installation afterward if ValheimPlus no longer appears on the title screen.
+
 Crossplay remains disabled while ValheimPlus is enabled. Enabling crossplay
 switches matchmaking to PlayFab and can be incompatible with mods.
 

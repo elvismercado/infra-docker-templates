@@ -33,4 +33,10 @@ assert.match(serverEnvironment, /^CROSSPLAY=false$/m);
 assert.match(serverEnvironment, /^SUPERVISOR_HTTP=false$/m);
 assert.match(serverEnvironment, /^STATUS_HTTP=false$/m);
 
+const readme = readProjectFile('README.md');
+assert.match(readme, /WindowsClient\.zip/);
+assert.match(readme, /steamapps[\\/]common[\\/]Valheim/);
+assert.match(readme, /ValheimPlus `0\.9\.17\.1`/);
+assert.match(readme, /default public branch/);
+
 console.log('Valheim template regression tests passed.');
