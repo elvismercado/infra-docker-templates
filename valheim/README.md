@@ -114,8 +114,9 @@ The dedicated playbook checks that the expected world `.db` and `.fwl` files
 exist and are regular files before running the role. It also requires the
 existing network to have the expected subnet and Compose labels, and requires
 the running container to use that network and the expected `/config` and
-`/opt/valheim` mounts. The role renders the complete Compose model before it
-replaces the container.
+`/opt/valheim` mounts. When ValheimPlus is enabled, the playbook also requires
+the existing `/config/valheimplus/valheim_plus.cfg` to be a regular file. The
+role renders the complete Compose model before it replaces the container.
 
 Deploy after the preflight succeeds:
 
@@ -127,6 +128,23 @@ cd /path/to/infra-homelab
 After an `invalid pool request` from an earlier migration attempt, no network
 cleanup is needed: the old container and `valheim_lloesche` network remain in
 use. Pull the corrected repositories and rerun the same dedicated playbook.
+
+An older role revision could also fail Compose validation with literal
+`--file=\1` arguments and an `open .../\1: no such file or directory` error.
+That failure occurs before container replacement, so do not delete the old
+container or network. Pull the corrected role and verify the rendered files on
+Yuna before retrying:
+
+```bash
+cd /mnt/user/appdata/valheim_lloesche1
+docker compose --env-file .env \
+   --file=docker-compose.yml \
+   --file=docker-compose.status.yml \
+   config --quiet
+```
+
+Successful validation produces no output. Rerun the dedicated playbook after
+this command succeeds.
 
 The first startup can take several minutes while SteamCMD updates the server.
 Confirm container health, inspect logs, join the expected world, verify admin
