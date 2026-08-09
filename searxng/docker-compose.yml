@@ -8,21 +8,21 @@ name: ${CONTAINER_NAME:-searxng}
 
 networks:
   default:
-    name: ${CONTAINER_NAME:-searxng}
+    name: ${NETWORK_NAME:-${CONTAINER_NAME:-searxng}}
     ipam:
       config:
         - subnet: ${SUBNET:-10.42.0.0/24}
 
 services:
   searxng:
-    image: docker.io/searxng/searxng:${IMAGE_VERSION:-latest}
+    image: ${SEARXNG_IMAGE_REPOSITORY:-docker.io/searxng/searxng}:${SEARXNG_VERSION:-latest}
     container_name: ${CONTAINER_NAME:-searxng}
     hostname: ${CONTAINER_NAME:-searxng}
     restart: always
     networks:
       - default
     ports:
-      - "${HTTP_PORT:-8080}:8080"
+      - "${HTTP_PORT:-8080}:${SEARXNG_PORT:-8080}"
     volumes:
       - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-searxng}:/etc/searxng:rw
       - searxng-data:/var/cache/searxng:rw
@@ -37,24 +37,27 @@ services:
       SEARXNG_IMAGE_PROXY: ${SEARXNG_IMAGE_PROXY:-true}
       SEARXNG_METHOD: ${SEARXNG_METHOD:-POST}
       SEARXNG_VALKEY_URL: valkey://${CONTAINER_NAME_VALKEY:-searxng-valkey}:6379/0
+      FORCE_OWNERSHIP: ${FORCE_OWNERSHIP:-true}
     depends_on:
       valkey:
-        condition: service_started
+        condition: service_healthy
+        restart: true
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080 || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:$${SEARXNG_PORT:-8080}/healthz || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 30s
     logging:
       driver: "json-file"
       options:
         max-size: "1m"
         max-file: "1"
     labels:
-      - "com.service=${CONTAINER_NAME:-searxng}"
+      com.service: "${CONTAINER_NAME:-searxng}"
 
   valkey:
-    image: docker.io/valkey/valkey:${VALKEY_IMAGE_VERSION:-9-alpine}
+    image: ${VALKEY_IMAGE_REPOSITORY:-docker.io/valkey/valkey}:${VALKEY_VERSION:-9-alpine}
     command: valkey-server --save 30 1 --loglevel warning
     container_name: ${CONTAINER_NAME_VALKEY:-searxng-valkey}
     hostname: ${CONTAINER_NAME_VALKEY:-searxng-valkey}
@@ -63,13 +66,19 @@ services:
       - default
     volumes:
       - valkey-data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     logging:
       driver: "json-file"
       options:
         max-size: "1m"
         max-file: "1"
     labels:
-      - "com.service=${CONTAINER_NAME_VALKEY:-searxng-valkey}"
+      com.service: "${CONTAINER_NAME_VALKEY:-searxng-valkey}"
 
 volumes:
   valkey-data:

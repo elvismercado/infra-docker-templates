@@ -16,6 +16,7 @@ use_default_settings:
       - brave.images
       - brave.videos
       - brave.news
+      - duckduckgo
       - mojeek
       - mojeek images
       - mojeek news
@@ -36,21 +37,6 @@ use_default_settings:
       - openstreetmap
       - openmeteo
 
-# Enable engines that are disabled by default upstream
-engines:
-  - name: bing
-    disabled: false
-  - name: mojeek
-    disabled: false
-  - name: mojeek images
-    disabled: false
-  - name: mojeek news
-    disabled: false
-  - name: gitlab
-    disabled: false
-  - name: openmeteo
-    disabled: false
-
 general:
   debug: false
   instance_name: "SearXNG"
@@ -58,6 +44,7 @@ general:
   donation_url: false
   contact_url: false
   enable_metrics: true
+  open_metrics: ""
 
 brand:
   issue_url: ""
@@ -128,6 +115,8 @@ engines:
     disabled: false
   - name: bing
     disabled: false
+  - name: duckduckgo
+    disabled: true
   - name: mojeek
     disabled: false
 
@@ -151,4 +140,12 @@ engines:
   - name: bing news
     disabled: false
   - name: mojeek news
+    disabled: false
+
+  # IT/developer
+  - name: gitlab
+    disabled: false
+
+  # Weather
+  - name: openmeteo
     disabled: false

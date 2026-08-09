@@ -3,12 +3,12 @@
 services:
   searxng:
     labels:
-      - "wud.watch=true"
-      - "wud.tag.include=^\\d+\\.\\d+\\.\\d+"
-      - "wud.trigger.include=smtp.gmail,docker.local"
+      wud.watch: "true"
+      wud.tag.include: '^\d+\.\d+\.\d+.*$$'
+      wud.trigger.include: "smtp.gmail,docker.local"
 
   valkey:
     labels:
-      - "wud.watch=true"
-      - "wud.tag.include=^\\d+\\.\\d+\\.\\d+$$"
-      - "wud.trigger.include=smtp.gmail,docker.local:minor"
+      wud.watch: "true"
+      wud.tag.include: '^\d+-alpine$$'
+      wud.trigger.include: "smtp.gmail,docker.local:minor"
