@@ -225,6 +225,8 @@ custom `ServerGameSettings.json`:
 	| `servant_convert_rate_modifier` | `ServantConvertRateModifier` | `0.25` through `6.0`. Servant conversion speed multiplier. |
 	| `repair_cost_modifier` | `RepairCostModifier` | `0.0` through `3.0`. Repair cost multiplier. |
 	| `durability_drain_modifier` | `DurabilityDrainModifier` | `0.0` through `3.0`. Normal durability drain multiplier. |
+	| `soul_shard_durability_loss_rate` | `SoulShard_DurabilityLossRate` | `0.0` through `3.0`. Soul Shard durability loss multiplier; `0.0` disables loss. |
+	| `relic_spawn_type` | `RelicSpawnType` | `Unique` allows one of each Soul Shard; `Plentiful` allows multiple copies. |
 	| `castle_relocation_enabled` | `CastleRelocationEnabled` | Boolean. Enable Castle Relocation. |
 	| `castle_blood_essence_drain_modifier` | `CastleBloodEssenceDrainModifier` | `0.0` through `3.0`. Castle upkeep multiplier. |
 	| `castle_decay_rate_modifier` | `CastleDecayRateModifier` | `0.0` through `3.0`. Unpowered castle decay multiplier. |
@@ -269,9 +271,10 @@ custom `ServerGameSettings.json`:
 
 	The Yuna profile uses `DeathContainerPermission: 2`, so only the owner can loot
 	the death container. `BloodBoundEquipment: true` separately keeps equipped gear
-	on death. The requested `0.1` durability and castle modifiers are substantial
-	reductions: equipment loses durability slowly, powered castles consume little
-	Blood Essence, and unpowered castles decay slowly.
+	on death. Normal equipment retains reduced durability loss at `0.1` and repair
+	costs remain at `0.5`. Soul Shard durability loss is disabled and
+	`RelicSpawnType: Plentiful` allows multiple copies to drop. Powered-castle Blood
+	Essence drain and unpowered-castle decay are both disabled with `0.0` modifiers.
 4. Start the container.
 
 The clan-size setting is separate from `MAX_CONNECTED_USERS`. A clan may be

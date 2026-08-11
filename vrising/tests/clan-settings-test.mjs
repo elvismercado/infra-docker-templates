@@ -31,6 +31,8 @@ const currentSettings = {
   ServantConvertRateModifier: 1,
   RepairCostModifier: 1,
   DurabilityDrainModifier: 1,
+  SoulShard_DurabilityLossRate: 1,
+  RelicSpawnType: 'Unique',
   CastleRelocationEnabled: false,
   CastleBloodEssenceDrainModifier: 1,
   CastleDecayRateModifier: 1,
@@ -132,6 +134,12 @@ const mergeGameplaySettings = (settings, options) => {
     ...(options.durability_drain_modifier === undefined
       ? {}
       : { DurabilityDrainModifier: Number(options.durability_drain_modifier) }),
+    ...(options.soul_shard_durability_loss_rate === undefined
+      ? {}
+      : { SoulShard_DurabilityLossRate: Number(options.soul_shard_durability_loss_rate) }),
+    ...(options.relic_spawn_type === undefined
+      ? {}
+      : { RelicSpawnType: String(options.relic_spawn_type) }),
     ...(options.castle_relocation_enabled === undefined
       ? {}
       : { CastleRelocationEnabled: Boolean(options.castle_relocation_enabled) }),
@@ -241,9 +249,11 @@ const requestedGameplaySettings = mergeGameplaySettings(currentSettings, {
   servant_convert_rate_modifier: 2,
   repair_cost_modifier: 0.5,
   durability_drain_modifier: 0.1,
+  soul_shard_durability_loss_rate: 0,
+  relic_spawn_type: 'Plentiful',
   castle_relocation_enabled: true,
-  castle_blood_essence_drain_modifier: 0.1,
-  castle_decay_rate_modifier: 0.1,
+  castle_blood_essence_drain_modifier: 0,
+  castle_decay_rate_modifier: 0,
   inactivity_kill_enabled: false,
   game_time_modifiers: {
     day_start_hour: 10,
@@ -267,9 +277,11 @@ assert.equal(requestedGameplaySettings.RefinementRateModifier, 2);
 assert.equal(requestedGameplaySettings.ServantConvertRateModifier, 2);
 assert.equal(requestedGameplaySettings.RepairCostModifier, 0.5);
 assert.equal(requestedGameplaySettings.DurabilityDrainModifier, 0.1);
+assert.equal(requestedGameplaySettings.SoulShard_DurabilityLossRate, 0);
+assert.equal(requestedGameplaySettings.RelicSpawnType, 'Plentiful');
 assert.equal(requestedGameplaySettings.CastleRelocationEnabled, true);
-assert.equal(requestedGameplaySettings.CastleBloodEssenceDrainModifier, 0.1);
-assert.equal(requestedGameplaySettings.CastleDecayRateModifier, 0.1);
+assert.equal(requestedGameplaySettings.CastleBloodEssenceDrainModifier, 0);
+assert.equal(requestedGameplaySettings.CastleDecayRateModifier, 0);
 assert.equal(requestedGameplaySettings.InactivityKillEnabled, false);
 assert.equal(requestedGameplaySettings.GameTimeModifiers.DayStartHour, 10);
 assert.equal(requestedGameplaySettings.GameTimeModifiers.DayStartMinute, 0);
@@ -285,6 +297,8 @@ assert.equal(typeof requestedGameplaySettings.MaterialYieldModifier_Global, 'num
 assert.equal(typeof requestedGameplaySettings.DropTableModifier_General, 'number');
 assert.equal(typeof requestedGameplaySettings.RepairCostModifier, 'number');
 assert.equal(typeof requestedGameplaySettings.DurabilityDrainModifier, 'number');
+assert.equal(typeof requestedGameplaySettings.SoulShard_DurabilityLossRate, 'number');
+assert.equal(typeof requestedGameplaySettings.RelicSpawnType, 'string');
 assert.equal(requestedGameplaySettings.GameTimeModifiers.DayDurationInSeconds, 10800);
 assert.equal(requestedGameplaySettings.GameTimeModifiers.BloodMoonFrequency_Min, 10);
 assert.equal(requestedGameplaySettings.GameTimeModifiers.BloodMoonFrequency_Max, 20);
@@ -307,6 +321,10 @@ assert.deepEqual(
 );
 assert.deepEqual(
   mergeGameplaySettings(requestedGameplaySettings, {
+    soul_shard_durability_loss_rate: 0,
+    relic_spawn_type: 'Plentiful',
+    castle_blood_essence_drain_modifier: 0,
+    castle_decay_rate_modifier: 0,
     game_time_modifiers: {
       day_start_hour: 10,
       day_start_minute: 0,
@@ -333,6 +351,8 @@ const partialGameplaySettings = mergeGameplaySettings(currentSettings, {
 });
 assert.equal(partialGameplaySettings.BloodBoundEquipment, true);
 assert.equal(partialGameplaySettings.DeathContainerPermission, currentSettings.DeathContainerPermission);
+assert.equal(partialGameplaySettings.SoulShard_DurabilityLossRate, currentSettings.SoulShard_DurabilityLossRate);
+assert.equal(partialGameplaySettings.RelicSpawnType, currentSettings.RelicSpawnType);
 assert.equal(partialGameplaySettings.GameTimeModifiers.DayStartHour, 10);
 assert.equal(partialGameplaySettings.GameTimeModifiers.DayEndHour, currentSettings.GameTimeModifiers.DayEndHour);
 assert.equal(partialGameplaySettings.GameTimeModifiers.DayEndMinute, currentSettings.GameTimeModifiers.DayEndMinute);
