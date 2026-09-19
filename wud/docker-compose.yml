@@ -39,6 +39,10 @@ services:
       WUD_WATCHER_LOCAL_CRON: ${WUD_CRON:-0 */6 * * *}
       WUD_WATCHER_LOCAL_WATCHEVENTS: true
 
+      ## Authentication (Mandatory in WUD v9+)
+      WUD_AUTH_ADMIN_USER: ${WUD_AUTH_ADMIN_USER:-admin}
+      WUD_AUTH_ADMIN_PASSWORD: ${WUD_AUTH_ADMIN_PASSWORD:-admin}
+
       ## Trigger — SMTP (Gmail) notifications in batch mode
       WUD_TRIGGER_SMTP_GMAIL_HOST: ${SMTP_HOST:-smtp.gmail.com}
       WUD_TRIGGER_SMTP_GMAIL_PORT: ${SMTP_PORT:-587}

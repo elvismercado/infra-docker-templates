@@ -50,6 +50,10 @@ for (const templatePath of modernizedTemplates) {
   assert.match(content, /com\.service=/, `Missing com.service label in ${templatePath}`);
 }
 
+// 4b. Seerr user configuration
+const seerr = readMediaFile('requests/seerr.yml');
+assert.match(seerr, /user:\s*"\$\{UID\}:\$\{GID\}"/);
+
 // 5. GHCR Migrations (FlareSolverr, Gluetun, Recyclarr)
 const flaresolverr = readMediaFile('indexers/flaresolverr.yml');
 assert.match(flaresolverr, /image: ghcr\.io\/flaresolverr\/flaresolverr:\$\{FLARESOLVERR_VERSION:-latest\}/);
