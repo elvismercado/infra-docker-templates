@@ -16,11 +16,16 @@ assert.match(networks, /name: \$\{CONTAINER_NAME_PREFIX:-media\}-net/);
 // 2. Main docker-compose.yml
 const mainCompose = readMediaFile('docker-compose.yml');
 assert.match(mainCompose, /name: \$\{CONTAINER_NAME_PREFIX:-media\}/);
+assert.match(mainCompose, /#\s*huntarr:/);
 assert.match(mainCompose, /file: players\/kavita\.yml/);
 assert.match(mainCompose, /file: indexers\/autobrr\.yml/);
 assert.match(mainCompose, /file: managers\/lidarr\.yml/);
 assert.match(mainCompose, /file: managers\/readarr\.yml/);
 assert.match(mainCompose, /file: dashboards\/homarr\.yml/);
+
+// 2b. WUD override
+const wudCompose = readMediaFile('docker-compose.wud.yml');
+assert.doesNotMatch(wudCompose, /^\s*huntarr:/m);
 
 // 3. Bazarr
 const bazarr = readMediaFile('managers/bazarr.yml');

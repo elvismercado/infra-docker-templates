@@ -16,11 +16,6 @@ services:
       - "wud.trigger.include=smtp.gmail,docker.local:minor"
 
   # Managers — notify + auto-update minor/patch
-  huntarr:
-    labels:
-      - "wud.watch=true"
-      - "wud.tag.include=^\\d+\\.\\d+\\.\\d+$$"
-      - "wud.trigger.include=smtp.gmail,docker.local:minor"
   radarr-movies-hd:
     labels:
       - "wud.watch=true"
