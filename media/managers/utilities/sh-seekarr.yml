@@ -1,0 +1,56 @@
+# https://github.com/GAS85/sh-seekarr
+# Periodic automated search trigger for Sonarr and Radarr
+
+x-base-env: &base-env
+  TZ: ${TZ:-Europe/London}
+
+services:
+  sh-seekarr-hd:
+    image: gas85/sh-seekarr:${SHSEEKARR_VERSION:-latest}
+    container_name: ${CONTAINER_NAME_PREFIX:-media}-sh-seekarr-hd
+    hostname: ${CONTAINER_NAME_PREFIX:-media}-sh-seekarr-hd
+    restart: always
+    networks:
+      - default
+    environment:
+      <<: *base-env
+      SHSEEKARR_APPS: "sonarr,sonarr_seasons,radarr"
+      SHSEEKARR_SEARCH_MODE: ${SHSEEKARR_SEARCH_MODE:-both}
+      SHSEEKARR_LIMIT: ${SHSEEKARR_LIMIT:-5}
+      SHSEEKARR_SCHEDULE_INTERVAL: ${SHSEEKARR_SCHEDULE_INTERVAL:-6h}
+      SHSEEKARR_SCHEDULE_RANDOMIZER: "true"
+      SHSEEKARR_SEARCH_ON_START: "false"
+      SHSEEKARR_SONARR_URL: http://${CONTAINER_NAME_PREFIX:-media}-sonarr-series-hd:8989
+      SHSEEKARR_SONARR_APIKEY: ${SONARR_APIKEY}
+      SHSEEKARR_RADARR_URL: http://${CONTAINER_NAME_PREFIX:-media}-radarr-movies-hd:7878
+      SHSEEKARR_RADARR_APIKEY: ${RADARR_APIKEY}
+    depends_on:
+      - sonarr-series-hd
+      - radarr-movies-hd
+    labels:
+      - "com.service=${CONTAINER_NAME_PREFIX:-media}-sh-seekarr-hd"
+
+  sh-seekarr-anime:
+    image: gas85/sh-seekarr:${SHSEEKARR_VERSION:-latest}
+    container_name: ${CONTAINER_NAME_PREFIX:-media}-sh-seekarr-anime
+    hostname: ${CONTAINER_NAME_PREFIX:-media}-sh-seekarr-anime
+    restart: always
+    networks:
+      - default
+    environment:
+      <<: *base-env
+      SHSEEKARR_APPS: "sonarr,sonarr_seasons,radarr"
+      SHSEEKARR_SEARCH_MODE: ${SHSEEKARR_SEARCH_MODE:-both}
+      SHSEEKARR_LIMIT: ${SHSEEKARR_LIMIT:-5}
+      SHSEEKARR_SCHEDULE_INTERVAL: ${SHSEEKARR_SCHEDULE_INTERVAL:-6h}
+      SHSEEKARR_SCHEDULE_RANDOMIZER: "true"
+      SHSEEKARR_SEARCH_ON_START: "false"
+      SHSEEKARR_SONARR_URL: http://${CONTAINER_NAME_PREFIX:-media}-sonarr-series-anime-hd:8989
+      SHSEEKARR_SONARR_APIKEY: ${SONARR_ANIME_APIKEY}
+      SHSEEKARR_RADARR_URL: http://${CONTAINER_NAME_PREFIX:-media}-radarr-movies-anime-hd:7878
+      SHSEEKARR_RADARR_APIKEY: ${RADARR_ANIME_APIKEY}
+    depends_on:
+      - sonarr-series-anime-hd
+      - radarr-movies-anime-hd
+    labels:
+      - "com.service=${CONTAINER_NAME_PREFIX:-media}-sh-seekarr-anime"

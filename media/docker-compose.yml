@@ -45,10 +45,15 @@ services:
       file: requests/seerr.yml
       service: seerr
 
-  # huntarr: # Deprecated upstream / deleted from Docker Hub. TODO: replace with sh-seekarr or seekarr
-  #   extends:
-  #     file: managers/utilities/huntarr.yml
-  #     service: huntarr
+  sh-seekarr-hd:
+    extends:
+      file: managers/utilities/sh-seekarr.yml
+      service: sh-seekarr-hd
+
+  sh-seekarr-anime:
+    extends:
+      file: managers/utilities/sh-seekarr.yml
+      service: sh-seekarr-anime
 
   gluetun:
     extends:

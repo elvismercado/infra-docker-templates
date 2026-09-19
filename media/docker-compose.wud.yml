@@ -15,6 +15,18 @@ services:
       - "wud.tag.include=^\\d+\\.\\d+\\.\\d+$$"
       - "wud.trigger.include=smtp.gmail,docker.local:minor"
 
+  # Automation utilities — notify + auto-update minor/patch
+  sh-seekarr-hd:
+    labels:
+      - "wud.watch=true"
+      - "wud.tag.include=^v?\\d+\\.\\d+\\.\\d+$$"
+      - "wud.trigger.include=smtp.gmail,docker.local:minor"
+  sh-seekarr-anime:
+    labels:
+      - "wud.watch=true"
+      - "wud.tag.include=^v?\\d+\\.\\d+\\.\\d+$$"
+      - "wud.trigger.include=smtp.gmail,docker.local:minor"
+
   # Managers — notify + auto-update minor/patch
   radarr-movies-hd:
     labels:

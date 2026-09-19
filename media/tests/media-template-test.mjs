@@ -16,7 +16,9 @@ assert.match(networks, /name: \$\{CONTAINER_NAME_PREFIX:-media\}-net/);
 // 2. Main docker-compose.yml
 const mainCompose = readMediaFile('docker-compose.yml');
 assert.match(mainCompose, /name: \$\{CONTAINER_NAME_PREFIX:-media\}/);
-assert.match(mainCompose, /#\s*huntarr:/);
+assert.match(mainCompose, /file: managers\/utilities\/sh-seekarr\.yml/);
+assert.match(mainCompose, /service: sh-seekarr-hd/);
+assert.match(mainCompose, /service: sh-seekarr-anime/);
 assert.match(mainCompose, /file: players\/kavita\.yml/);
 assert.match(mainCompose, /file: indexers\/autobrr\.yml/);
 assert.match(mainCompose, /file: managers\/lidarr\.yml/);
@@ -26,6 +28,14 @@ assert.match(mainCompose, /file: dashboards\/homarr\.yml/);
 // 2b. WUD override
 const wudCompose = readMediaFile('docker-compose.wud.yml');
 assert.doesNotMatch(wudCompose, /^\s*huntarr:/m);
+assert.match(wudCompose, /sh-seekarr-hd:/);
+assert.match(wudCompose, /sh-seekarr-anime:/);
+
+// 2c. sh-seekarr utility definition
+const shSeekarr = readMediaFile('managers/utilities/sh-seekarr.yml');
+assert.match(shSeekarr, /sh-seekarr-hd:/);
+assert.match(shSeekarr, /sh-seekarr-anime:/);
+assert.match(shSeekarr, /image: gas85\/sh-seekarr:\$\{SHSEEKARR_VERSION:-latest\}/);
 
 // 3. Bazarr
 const bazarr = readMediaFile('managers/bazarr.yml');
@@ -69,6 +79,9 @@ const envExample = readMediaFile('.env.example');
 assert.match(envExample, /^NZBGET_HTTP_PORT=6789$/m);
 assert.match(envExample, /^TRANSMISSION_WEB_HOME=$/m);
 assert.match(envExample, /^RECYCLARR_VERSION=7$/m);
+assert.match(envExample, /^SHSEEKARR_VERSION=latest$/m);
+assert.match(envExample, /^SHSEEKARR_SCHEDULE_INTERVAL=6h$/m);
+assert.match(envExample, /^SHSEEKARR_LIMIT=5$/m);
 assert.match(envExample, /^AUTOBRR_VERSION=latest$/m);
 assert.match(envExample, /^HOMARR_VERSION=latest$/m);
 assert.doesNotMatch(envExample, /HOMARR_VERSSION/);
