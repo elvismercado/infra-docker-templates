@@ -29,8 +29,8 @@ services:
   # Anime Movies/Series Subtitles
   bazarr-anime-hd:
     image: lscr.io/linuxserver/bazarr:${BAZARR_VERSION:-latest}
-    container_name: ${CONTAINER_NAME_PREFIX:-media}-bazarr-anime
-    hostname: ${CONTAINER_NAME_PREFIX:-media}-bazarr-anime
+    container_name: ${CONTAINER_NAME_PREFIX:-media}-bazarr-anime-hd
+    hostname: ${CONTAINER_NAME_PREFIX:-media}-bazarr-anime-hd
     restart: always
     networks:
       - default

@@ -20,7 +20,7 @@
 
 # This setup is for running in my Unraid server
 
-name: media
+name: ${CONTAINER_NAME_PREFIX:-media}
 
 x-base-env: &base-env
   TZ: ${TZ:-Europe/London}
@@ -102,27 +102,32 @@ services:
 
   # kavita:
   #   extends:
-  #     file: kavita.yml
+  #     file: players/kavita.yml
   #     service: kavita
 
-  # # autobrr:
-  # #   extends:
-  # #     file: autobrr.yml
-  # #     service: autobrr
+  # autobrr:
+  #   extends:
+  #     file: indexers/autobrr.yml
+  #     service: autobrr
 
   # lidarr:
   #   extends:
-  #     file: lidarr.yml
+  #     file: managers/lidarr.yml
   #     service: lidarr
 
   # readarr-books:
   #   extends:
-  #     file: readarr.yml
+  #     file: managers/readarr.yml
   #     service: readarr-books
   # readarr-audiobooks:
   #   extends:
-  #     file: readarr.yml
+  #     file: managers/readarr.yml
   #     service: readarr-audiobooks
+
+  # homarr:
+  #   extends:
+  #     file: dashboards/homarr.yml
+  #     service: homarr
 
   bazarr-anime-hd:
     extends:

@@ -1,27 +1,28 @@
 # https://autobrr.com/installation/docker
 # Indexer
 
-version: "3.9"
-
-x-base-env: &base-env # Unraid
+x-base-env: &base-env
+  TZ: ${TZ:-Europe/London}
   PUID: ${UID}
   PGID: ${GID}
   UMASK: ${UMASK}
-  TZ: ${TZ}
 
 services:
   autobrr:
     image: ghcr.io/autobrr/autobrr:${AUTOBRR_VERSION:-latest}
     container_name: ${CONTAINER_NAME_PREFIX:-media}-autobrr
+    hostname: ${CONTAINER_NAME_PREFIX:-media}-autobrr
     restart: always
-    user: "${PUID}:${PGID}"
+    user: "${UID}:${GID}"
     networks:
-      - media-net
+      - default
     volumes:
-      - ${APPDATA_BASE_PATH}/autobrr/config:/config
+      - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME_PREFIX:-media}/containers/autobrr:/config
     ports:
       - ${AUTOBRR_HTTP_PORT:-7474}:7474
     environment:
       <<: *base-env
       # AUTOBRR__CUSTOM_DEFINITIONS: string
       AUTOBRR__CHECK_FOR_UPDATES: false
+    labels:
+      - "com.service=${CONTAINER_NAME_PREFIX:-media}-autobrr"

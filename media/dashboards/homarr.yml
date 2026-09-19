@@ -1,28 +1,29 @@
 # https://homarr.dev/docs/getting-started/installation#installation
 
-version: "3.9"
-
 x-base-env: &base-env
+  TZ: ${TZ:-Europe/London}
   PUID: ${UID}
   PGID: ${GID}
   UMASK: ${UMASK}
-  TZ: ${TZ}
 
 services:
   homarr:
-    image: ghcr.io/ajnart/homarr:${HOMARR_VERSSION:-latest}
+    image: ghcr.io/ajnart/homarr:${HOMARR_VERSION:-latest}
     container_name: ${CONTAINER_NAME_PREFIX:-media}-homarr
+    hostname: ${CONTAINER_NAME_PREFIX:-media}-homarr
     restart: always
     user: "${UID}:${GID}"
     networks:
-      - media-net
+      - default
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${APPDATA_BASE_PATH}/homarr/configs:/app/data/configs
-      - ${APPDATA_BASE_PATH}/homarr/icons:/app/public/icons
-      - ${APPDATA_BASE_PATH}/homarr/data:/data
+      - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock:ro
+      - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME_PREFIX:-media}/containers/homarr/configs:/app/data/configs
+      - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME_PREFIX:-media}/containers/homarr/icons:/app/public/icons
+      - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME_PREFIX:-media}/containers/homarr/data:/data
     ports:
       - ${HOMARR_HTTP_PORT:-7575}:7575
     environment:
       <<: *base-env
       DISABLE_ANALYTICS: true
+    labels:
+      - "com.service=${CONTAINER_NAME_PREFIX:-media}-homarr"
