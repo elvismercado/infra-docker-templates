@@ -72,8 +72,7 @@ x-updater: &updater
 
 services:
   gluetun:
-    image: qmcgaw/gluetun:${GLUETUN_VERSION:-latest}
-    # image: ghcr.io/qdm12/gluetun
+    image: ghcr.io/qdm12/gluetun:${GLUETUN_VERSION:-latest}
     # container_name: ${NAME_PREFIX:-gluetun}
     # container_name: gluetun
     # line above must be uncommented to allow external containers to connect.

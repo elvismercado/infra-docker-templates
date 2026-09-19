@@ -45,9 +45,15 @@ for (const templatePath of modernizedTemplates) {
   assert.match(content, /com\.service=/, `Missing com.service label in ${templatePath}`);
 }
 
-// 5. FlareSolverr
+// 5. GHCR Migrations (FlareSolverr, Gluetun, Recyclarr)
 const flaresolverr = readMediaFile('indexers/flaresolverr.yml');
 assert.match(flaresolverr, /image: ghcr\.io\/flaresolverr\/flaresolverr:\$\{FLARESOLVERR_VERSION:-latest\}/);
+
+const gluetun = readMediaFile('vpns/gluetun.yml');
+assert.match(gluetun, /image: ghcr\.io\/qdm12\/gluetun:\$\{GLUETUN_VERSION:-latest\}/);
+
+const recyclarr = readMediaFile('managers/utilities/recyclarr.yml');
+assert.match(recyclarr, /image: ghcr\.io\/recyclarr\/recyclarr:\$\{RECYCLARR_VERSION:-latest\}/);
 
 // 6. Environment example
 const envExample = readMediaFile('.env.example');

@@ -5,7 +5,7 @@ x-base-env: &base-env
 
 services:
   recyclarr:
-    image: recyclarr/recyclarr:${RECYCLARR_VERSION:-latest}
+    image: ghcr.io/recyclarr/recyclarr:${RECYCLARR_VERSION:-latest}
     container_name: ${CONTAINER_NAME_PREFIX:-media}-recyclarr
     hostname: ${CONTAINER_NAME_PREFIX:-media}-recyclarr
     restart: always
