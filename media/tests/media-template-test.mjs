@@ -53,12 +53,13 @@ const gluetun = readMediaFile('vpns/gluetun.yml');
 assert.match(gluetun, /image: ghcr\.io\/qdm12\/gluetun:\$\{GLUETUN_VERSION:-latest\}/);
 
 const recyclarr = readMediaFile('managers/utilities/recyclarr.yml');
-assert.match(recyclarr, /image: ghcr\.io\/recyclarr\/recyclarr:\$\{RECYCLARR_VERSION:-latest\}/);
+assert.match(recyclarr, /image: ghcr\.io\/recyclarr\/recyclarr:\$\{RECYCLARR_VERSION:-7\}/);
 
 // 6. Environment example
 const envExample = readMediaFile('.env.example');
 assert.match(envExample, /^NZBGET_HTTP_PORT=6789$/m);
 assert.match(envExample, /^TRANSMISSION_WEB_HOME=$/m);
+assert.match(envExample, /^RECYCLARR_VERSION=7$/m);
 assert.match(envExample, /^AUTOBRR_VERSION=latest$/m);
 assert.match(envExample, /^HOMARR_VERSION=latest$/m);
 assert.doesNotMatch(envExample, /HOMARR_VERSSION/);

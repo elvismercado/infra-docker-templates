@@ -44,7 +44,7 @@ services:
   recyclarr:
     labels:
       - "wud.watch=true"
-      - "wud.tag.include=^\\d+\\.\\d+\\.\\d+$$"
+      - "wud.tag.include=^7\\.\\d+\\.\\d+$$"
       - "wud.trigger.include=smtp.gmail,docker.local:minor"
   bazarr-hd:
     labels:
