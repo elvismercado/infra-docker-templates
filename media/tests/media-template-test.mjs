@@ -76,6 +76,7 @@ assert.match(recyclarr, /image: ghcr\.io\/recyclarr\/recyclarr:\$\{RECYCLARR_VER
 
 // 6. Environment example
 const envExample = readMediaFile('.env.example');
+assert.match(envExample, /^TRANSMISSION_VERSION=4\.1\.3$/m);
 assert.match(envExample, /^NZBGET_HTTP_PORT=6789$/m);
 assert.match(envExample, /^TRANSMISSION_WEB_HOME=$/m);
 assert.match(envExample, /^RECYCLARR_VERSION=7$/m);
