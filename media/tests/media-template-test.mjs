@@ -45,7 +45,11 @@ for (const templatePath of modernizedTemplates) {
   assert.match(content, /com\.service=/, `Missing com.service label in ${templatePath}`);
 }
 
-// 5. Environment example
+// 5. FlareSolverr
+const flaresolverr = readMediaFile('indexers/flaresolverr.yml');
+assert.match(flaresolverr, /image: ghcr\.io\/flaresolverr\/flaresolverr:\$\{FLARESOLVERR_VERSION:-latest\}/);
+
+// 6. Environment example
 const envExample = readMediaFile('.env.example');
 assert.match(envExample, /^NZBGET_HTTP_PORT=6789$/m);
 assert.match(envExample, /^TRANSMISSION_WEB_HOME=$/m);

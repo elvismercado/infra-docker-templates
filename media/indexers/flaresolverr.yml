@@ -6,7 +6,7 @@ x-base-env: &base-env
 
 services:
   flaresolverr:
-    image: flaresolverr/flaresolverr:${FLARESOLVERR_VERSION:-latest}
+    image: ghcr.io/flaresolverr/flaresolverr:${FLARESOLVERR_VERSION:-latest}
     # container_name: ${CONTAINER_NAME_PREFIX:-media}-flaresolverr # can't set container_name and flaresolverr as container name must be unique
     hostname: ${CONTAINER_NAME_PREFIX:-media}-flaresolverr
     restart: always
