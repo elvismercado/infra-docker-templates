@@ -1,0 +1,35 @@
+# https://github.com/Finsys/dockhand
+# Dockhand
+
+x-base-env: &base-env
+  TZ: ${TZ:-Europe/London}
+  PUID: ${PUID:-1001}
+  PGID: ${PGID:-1001}
+
+name: ${CONTAINER_NAME:-dockhand}
+
+networks:
+  default:
+    name: ${CONTAINER_NAME:-dockhand}
+    ipam:
+      config:
+        - subnet: ${SUBNET:-10.42.0.0/24}
+
+services:
+  dockhand:
+    image: fnsys/dockhand:${IMAGE_VERSION:-latest}
+    container_name: ${CONTAINER_NAME:-dockhand}
+    hostname: ${CONTAINER_NAME:-dockhand}
+    restart: always
+    networks:
+      - default
+    volumes:
+      - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-dockhand}:/app/data
+      - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock
+    ports:
+      - ${HTTP_PORT:-12321}:3000/tcp
+    environment:
+      <<: *base-env
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+    labels:
+      - "com.service=${CONTAINER_NAME:-dockhand}"

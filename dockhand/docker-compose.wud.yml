@@ -1,0 +1,9 @@
+# Dockhand WUD policy - automatically update the floating latest image digest
+
+services:
+  dockhand:
+    labels:
+      - "wud.watch=true"
+      - "wud.watch.digest=true"
+      - "wud.tag.include=^latest$$"
+      - "wud.trigger.include=smtp.gmail,docker.local"
