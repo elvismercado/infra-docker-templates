@@ -34,9 +34,10 @@ services:
     environment:
       <<: *base-env
 
-      ## Watcher — opt-in only, containers need wud.watch=true label
+      ## Watcher - opt-in only, containers need wud.watch=true label
       WUD_WATCHER_LOCAL_WATCHBYDEFAULT: false
-      WUD_WATCHER_LOCAL_CRON: ${WUD_CRON:-0 */6 * * *}
+      ## Scan every other calendar day at midnight
+      WUD_WATCHER_LOCAL_CRON: ${WUD_CRON:-0 0 */2 * *}
       WUD_WATCHER_LOCAL_WATCHEVENTS: true
 
       ## Authentication (Mandatory in WUD v9+)
@@ -63,8 +64,9 @@ services:
       retries: 3
       start_period: 30s
     labels:
-      ## Self-watch: notify + auto-update
+      ## Self-watch: notify + auto-update the floating latest digest
       - "wud.watch=true"
-      - "wud.tag.include=^\\d+\\.\\d+\\.\\d+$$"
+      - "wud.watch.digest=true"
+      - "wud.tag.include=^latest$$"
       - "wud.trigger.include=smtp.gmail,docker.local"
       - "com.service=${CONTAINER_NAME:-wud}"

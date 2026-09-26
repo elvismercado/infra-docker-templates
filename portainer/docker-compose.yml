@@ -17,7 +17,7 @@ networks:
 
 services:
   portainer:
-    image: portainer/portainer-ce:${IMAGE_VERSION:-lts}
+    image: portainer/portainer-ce:${IMAGE_VERSION:-latest}
     container_name: ${CONTAINER_NAME:-portainer}
     hostname: ${CONTAINER_NAME:-portainer}
     restart: always

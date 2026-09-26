@@ -1,7 +1,6 @@
 # Portainer CE
 
-This template follows Portainer's official long-term support channel with
-`portainer/portainer-ce:lts`.
+This template follows Portainer's floating `latest` image tag.
 
 ## Compose deployment
 
@@ -21,12 +20,11 @@ docker compose -f docker-compose.yml -f docker-compose.edgecompute.yml up -d
 # Legacy HTTP UI on port 9000
 docker compose -f docker-compose.yml -f docker-compose.legacy.yml up -d
 
-# WUD notifications and automatic LTS digest updates
+# WUD notifications and automatic latest digest updates
 docker compose -f docker-compose.yml -f docker-compose.wud.yml up -d
 ```
 
-The WUD overlay follows digest changes to the floating `lts` tag. It does not
-follow the `sts` channel.
+The WUD overlay follows digest changes to the floating `latest` tag.
 
 ## Direct Docker deployment
 
@@ -34,13 +32,13 @@ Using a named volume:
 
 ```sh
 docker volume create portainer_data
-docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:lts
+docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
 ```
 
 Using an Unraid appdata bind mount:
 
 ```sh
-docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v /mnt/user/appdata/portainer:/data portainer/portainer-ce:lts
+docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v /mnt/user/appdata/portainer:/data portainer/portainer-ce:latest
 ```
 
 ## Access and ports

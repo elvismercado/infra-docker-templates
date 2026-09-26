@@ -1,9 +1,9 @@
-# WUD (What's Up Docker?) labels - notify + auto-update the floating LTS digest
+# WUD (What's Up Docker?) labels - notify + auto-update the floating latest digest
 
 services:
   portainer:
     labels:
       - "wud.watch=true"
       - "wud.watch.digest=true"
-      - "wud.tag.include=^lts$$"
+      - "wud.tag.include=^latest$$"
       - "wud.trigger.include=smtp.gmail,docker.local"
