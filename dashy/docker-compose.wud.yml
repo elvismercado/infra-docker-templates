@@ -1,11 +1,12 @@
 # WUD (What's Up Docker?) optional overlay for Dashy.
 # The Ansible Dashy role includes this file when enable_wud is true.
 # Direct Compose users must include this overlay explicitly.
-# Labels opt Dashy into WUD monitoring and minor/patch updates.
+# Labels opt Dashy into WUD monitoring and automatic latest digest updates.
 
 services:
   dashy:
     labels:
       - "wud.watch=true"
-      - "wud.tag.include=^\\d+\\.\\d+\\.\\d+$$"
-      - "wud.trigger.include=smtp.gmail,docker.local:minor"
+      - "wud.watch.digest=true"
+      - "wud.tag.include=^latest$$"
+      - "wud.trigger.include=smtp.gmail,docker.local"
