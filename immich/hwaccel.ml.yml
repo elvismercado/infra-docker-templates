@@ -49,11 +49,3 @@ services:
       - /dev/dxg:/dev/dxg
     volumes:
       - /usr/lib/wsl:/usr/lib/wsl
-
-  openvino-wsl:
-    devices:
-      - /dev/dri:/dev/dri
-      - /dev/dxg:/dev/dxg
-    volumes:
-      - /dev/bus/usb:/dev/bus/usb
-      - /usr/lib/wsl:/usr/lib/wsl
