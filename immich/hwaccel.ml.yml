@@ -41,12 +41,14 @@ services:
       - /dev/kfd:/dev/kfd
 
   openvino:
-    device_cgroup_rules:
-      - 'c 189:* rmw'
     devices:
       - /dev/dri:/dev/dri
+
+  openvino-wsl:
+    devices:
+      - /dev/dxg:/dev/dxg
     volumes:
-      - /dev/bus/usb:/dev/bus/usb
+      - /usr/lib/wsl:/usr/lib/wsl
 
   openvino-wsl:
     devices:

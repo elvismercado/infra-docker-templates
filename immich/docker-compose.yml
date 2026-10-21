@@ -58,6 +58,8 @@ services:
       service: ${IMMICH_ML_SERVICE:-cpu} # set to one of [armnn, cuda, rocm, openvino, openvino-wsl, rknn] for accelerated inference - use the `-wsl` version for WSL2 where applicable
     volumes:
       - model-cache:/cache
+    environment:
+      MACHINE_LEARNING_MODEL_REVISION: ${MACHINE_LEARNING_MODEL_REVISION:-v2}
     restart: always
     healthcheck:
       disable: false
@@ -67,11 +69,11 @@ services:
       - "com.service=${CONTAINER_NAME:-immich}_machine_learning"
 
   redis:
-    image: docker.io/valkey/valkey:9@sha256:3eeb09785cd61ec8e3be35f8804c8892080f3ca21934d628abc24ee4ed1698f6
+    image: docker.io/valkey/valkey:9@sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd
     container_name: ${CONTAINER_NAME:-immich}_redis
     hostname: ${CONTAINER_NAME:-immich}_redis
     healthcheck:
-      test: redis-cli ping || exit 1
+      test: redis-cli ping | grep -q PONG || exit 1
     restart: always
     networks:
       - default
