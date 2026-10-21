@@ -22,7 +22,7 @@ networks:
 
 services:
   duplicati:
-    image: lscr.io/linuxserver/duplicati:latest
+    image: lscr.io/linuxserver/duplicati:${IMAGE_VERSION:-latest}
     container_name: ${CONTAINER_NAME:-duplicati}
     hostname: ${CONTAINER_NAME:-duplicati}
     restart: always

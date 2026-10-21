@@ -22,7 +22,7 @@ networks:
 
 services:
   syncthing:
-    image: lscr.io/linuxserver/syncthing:latest
+    image: lscr.io/linuxserver/syncthing:${IMAGE_VERSION:-latest}
     container_name: ${CONTAINER_NAME:-syncthing}
     hostname: ${CONTAINER_NAME:-syncthing}
     restart: always

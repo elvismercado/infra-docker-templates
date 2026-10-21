@@ -5,11 +5,11 @@ services:
     labels:
       - "wud.watch=true"
       - "wud.watch.digest=true"
-      - "wud.tag.include=^\\d+\\.\\d+\\.\\d+$$"
+      - "wud.tag.include=^latest$$"
       - "wud.trigger.include=smtp.gmail,docker.local"
   backvault:
     labels:
       - "wud.watch=true"
       - "wud.watch.digest=true"
-      - "wud.tag.include=^\\d+\\.\\d+\\.\\d+$$"
+      - "wud.tag.include=^latest$$"
       - "wud.trigger.include=smtp.gmail,docker.local"

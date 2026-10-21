@@ -6,12 +6,12 @@ services:
   immich-server:
     labels:
       - "wud.watch=true"
-      - "wud.tag.include=^\\d+\\.\\d+\\.\\d+$$"
+      - "wud.tag.include=^v?\\d+\\.\\d+\\.\\d+$$"
       - "wud.trigger.include=smtp.gmail,docker.local:minor"
   immich-machine-learning:
     labels:
       - "wud.watch=true"
-      - "wud.tag.include=^\\d+\\.\\d+\\.\\d+$$"
+      - "wud.tag.include=^v?\\d+\\.\\d+\\.\\d+$$"
       - "wud.trigger.include=smtp.gmail,docker.local:minor"
   redis:
     labels:
