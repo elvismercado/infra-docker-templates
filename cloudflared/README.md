@@ -99,11 +99,11 @@ services:
 
 ## Metrics & Healthcheck
 
-`TUNNEL_METRICS` defaults to `127.0.0.1:2000` inside the container. The Docker healthcheck uses `cloudflared tunnel --metrics 127.0.0.1:2000 ready` to verify active tunnel connectivity (`/ready` returns 200 when connected, 503 otherwise).
+`TUNNEL_METRICS` defaults to `127.0.0.1:2000` inside the container. The Docker healthcheck uses `cloudflared tunnel --metrics ${TUNNEL_METRICS:-127.0.0.1:2000} ready` to verify active tunnel connectivity (`/ready` returns 200 when connected, 503 otherwise). If `TUNNEL_METRICS` is customized (e.g. `127.0.0.1:3000`), the healthcheck probe dynamically follows the configured endpoint.
 
 To expose metrics externally (e.g., for Prometheus scraping):
-1. Set `TUNNEL_METRICS=0.0.0.0:2000` in `.env`
-2. Uncomment `ports:` in `docker-compose.yml` (mapping `${METRICS_PORT:-2000}:2000`)
+1. Set `TUNNEL_METRICS=0.0.0.0:2000` in `.env` (or custom port `0.0.0.0:<port>`)
+2. Uncomment `ports:` in `docker-compose.yml` (mapping `${METRICS_PORT:-2000}:2000` or `${METRICS_PORT:-<port>}:<port>`)
 
 Available endpoints:
 - `/ready` — 200 when tunnel is connected, 503 otherwise (use with external monitors like Uptime Kuma)
