@@ -1,0 +1,301 @@
+---
+# Copy this file to conf.yml and replace the example values for your dashboard.
+
+appConfig:
+  startingView: home
+  theme: glass
+  layout: horizontal
+  iconSize: large
+  language: en
+  defaultOpeningMethod: newtab
+  statusCheck: false
+  enableFontAwesome: true
+  disableConfiguration: true
+  hideComponents:
+    hideHeading: false
+    hideNav: false
+    hideSearch: true
+    hideSettings: true
+    hideFooter: false
+  customCss: |-
+    .settings-outer,
+    .burger,
+    .edit-mode-item {
+      display: none !important;
+    }
+    #dashy {
+      display: flex !important;
+      flex-direction: column !important;
+    }
+    header {
+      display: contents !important;
+    }
+    .page-titles {
+      order: -1 !important;
+      flex-direction: column !important;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      margin-top: 0.75rem !important;
+      overflow: visible !important;
+      text-align: center;
+    }
+    .page-titles h1 {
+      white-space: normal !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+    }
+    .nav-outer,
+    .nav-outer.floating {
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 100 !important;
+      order: -2 !important;
+      display: flex !important;
+      justify-content: center;
+      width: 100%;
+    }
+    .nav-outer > #nav {
+      position: static !important;
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap;
+      justify-content: center !important;
+      align-items: center !important;
+      gap: 0.5rem 0.75rem !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      max-height: none !important;
+      overflow: visible !important;
+      padding: 0 !important;
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+    }
+    .nav-outer .nav-item {
+      margin: 0 !important;
+    }
+    .section-header {
+      cursor: default !important;
+      pointer-events: none !important;
+    }
+    .section-header .collapse-toggle,
+    .section-header .header-action {
+      display: none !important;
+    }
+    footer {
+      display: block !important;
+      position: sticky;
+      bottom: 0;
+      z-index: 100;
+      opacity: 0.98 !important;
+    }
+    footer > div {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.5rem !important;
+      width: 100%;
+    }
+    footer > div > div {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      justify-content: center !important;
+      align-items: center !important;
+      gap: 0.5rem 1.5rem !important;
+      padding: 0.5rem 1rem 0 !important;
+      font-size: 0.95rem !important;
+    }
+    footer > div > div:last-child {
+      padding: 0 1rem 0.5rem !important;
+    }
+    footer > div > hr {
+      border: none !important;
+      border-top: 1px solid rgb(94, 100, 116) !important;
+      width: 100% !important;
+      margin: 0 !important;
+    }
+    footer a,
+    footer span {
+      display: inline-block !important;
+      padding: 0.25rem 0.5rem !important;
+      margin: 0.1rem 0.4rem !important;
+      color: inherit !important;
+      text-decoration: underline !important;
+    }
+
+pageInfo:
+  title: HOMELAB - HOST
+  description: Replace with this host's model or dashboard purpose
+  navLinks:
+    - title: HOST A
+      path: https://dashboard-a.example.invalid
+      target: sametab
+    - title: HOST B
+      path: https://dashboard-b.example.invalid
+      target: sametab
+    - title: HOST C
+      path: https://dashboard-c.example.invalid
+      target: sametab
+    - title: HOST D
+      path: https://dashboard-d.example.invalid
+      target: sametab
+    - title: HOST E
+      path: https://dashboard-e.example.invalid
+      target: sametab
+  footer: |-
+    <div>
+      <div>
+        <span>VLAN XX</span>
+        <a href="http://192.0.2.10:8080">192.0.2.10:8080</a>
+        <a href="https://dashboard.example.invalid">dashboard.example.invalid</a>
+        <a href="https://domain.example.invalid">domain.example.invalid</a>
+      </div>
+      <hr>
+      <div>
+        <a href="http://192.0.2.11:8080">HOST A</a>
+        <a href="http://192.0.2.12:8080">HOST B</a>
+        <a href="http://192.0.2.13:8080">HOST C</a>
+        <a href="http://192.0.2.14:8080">HOST D</a>
+        <a href="http://192.0.2.15:8080">HOST E</a>
+      </div>
+    </div>
+  logo: "https://i.ibb.co/yhbt6CY/dashy.png"
+
+sections:
+  # Keep the categories that suit this dashboard and remove the rest.
+  # Replace each example URL, icon, title, and description.
+  - name: Admin
+    icon: fas fa-tools
+    items:
+      - title: Host Admin
+        description: Replace with this host's administration interface
+        icon: fas fa-server
+        url: http://192.0.2.10:8443
+      - title: Container UI
+        description: Replace with your container management interface
+        icon: fab fa-docker
+        url: https://example.invalid/container-admin
+
+  - name: Dashboards
+    icon: fas fa-th-large
+    items:
+      - title: Network
+        description: Replace with your network dashboard
+        icon: fas fa-network-wired
+        url: https://dashboard-network.example.invalid
+      - title: Media
+        description: Replace with your media dashboard
+        icon: fas fa-film
+        url: https://dashboard-media.example.invalid
+
+  - name: Apps
+    icon: fas fa-rocket
+    items:
+      - title: App One
+        description: Replace with an application link
+        icon: fas fa-cube
+        url: https://example.invalid/app-one
+      - title: App Two
+        description: Replace with another application link
+        icon: fas fa-cube
+        url: https://example.invalid/app-two
+
+  - name: Backup
+    icon: fas fa-database
+    items:
+      - title: Backup Status
+        description: Replace with your backup interface
+        icon: fas fa-database
+        url: https://example.invalid/backup
+
+  - name: Network
+    icon: fas fa-network-wired
+    items:
+      - title: Router
+        description: Replace with your router interface
+        icon: fas fa-network-wired
+        url: https://example.invalid/router
+      - title: DNS
+        description: Replace with your DNS management interface
+        icon: fas fa-globe
+        url: https://example.invalid/dns
+
+  - name: Wi-Fi
+    icon: fas fa-wifi
+    items:
+      - title: Wi-Fi Admin
+        description: Replace with your wireless controller
+        icon: fas fa-wifi
+        url: https://example.invalid/wifi
+
+  - name: Services
+    icon: fas fa-server
+    items:
+      - title: Service One
+        description: Replace with a service link
+        icon: fas fa-cube
+        url: https://example.invalid/service-one
+
+  - name: Bookmarks
+    icon: fas fa-bookmark
+    items:
+      - title: Documentation
+        description: Replace with a useful documentation link
+        icon: fas fa-book
+        url: https://example.invalid/docs
+      - title: Source Code
+        description: Replace with a repository link
+        icon: fab fa-github
+        url: https://example.invalid/source-code
+
+  - name: Projects
+    icon: fas fa-project-diagram
+    items:
+      - title: Project One
+        description: Replace with a project link
+        icon: fas fa-code
+        url: https://example.invalid/project-one
+
+  - name: Downloaders
+    icon: fas fa-download
+    items:
+      - title: Downloader
+        description: Replace with a download client
+        icon: fas fa-download
+        url: https://example.invalid/downloader
+
+  - name: Indexers
+    icon: fas fa-search
+    items:
+      - title: Indexer
+        description: Replace with an indexer interface
+        icon: fas fa-search
+        url: https://example.invalid/indexer
+
+  - name: Media
+    icon: fas fa-film
+    items:
+      - title: Media Server
+        description: Replace with your media server
+        icon: fas fa-play-circle
+        url: https://example.invalid/media
+
+  - name: VPN Status
+    icon: fas fa-shield-alt
+    items:
+      - title: VPN Status
+        description: Replace with a VPN status page or widget
+        icon: fas fa-shield-alt
+        url: https://example.invalid/vpn-status
+
+  - name: Gluetun
+    icon: fas fa-shield-alt
+    items:
+      - title: VPN Control
+        description: Replace with your VPN control interface
+        icon: fas fa-shield-alt
+        url: https://example.invalid/vpn-control
+      - title: Port Forwarding
+        description: Replace with your port-forwarding status
+        icon: fas fa-exchange-alt
+        url: https://example.invalid/port-forwarding
