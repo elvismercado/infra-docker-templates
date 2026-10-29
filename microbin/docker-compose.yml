@@ -4,17 +4,17 @@
 # This setup is for running in my Unraid server
 
 x-base-env: &base-env
-  PUID: ${UID}
-  PGID: ${GID}
-  UID: ${UID}
-  GID: ${GID}
+  PUID: ${UID:-99}
+  PGID: ${GID:-100}
+  UID: ${UID:-99}
+  GID: ${GID:-100}
   UMASK: ${UMASK:-022}
   TZ: ${TZ:-Europe/London}
 
 name: ${CONTAINER_NAME:-microbin}
 
 networks:
-  mynetwork:
+  default:
     name: ${CONTAINER_NAME:-microbin}
     ipam:
       config:
@@ -22,13 +22,12 @@ networks:
 
 services:
   microbin:
-    image: danielszabo99/microbin:latest
+    image: danielszabo99/microbin:${IMAGE_VERSION:-latest}
     container_name: ${CONTAINER_NAME:-microbin}
     hostname: ${CONTAINER_NAME:-microbin}
     restart: always
     networks:
-      mynetwork:
-        ipv4_address: ${IP_ADDRESS:-10.42.0.10}
+      - default
     volumes:
       - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-microbin}:/app/microbin_data
     ports:
@@ -36,7 +35,7 @@ services:
     environment:
       <<: *base-env
       MICROBIN_EDITABLE: ${MICROBIN_EDITABLE:-false}
-      MICROBIN_FOOTER_TEXT: "This is a public and unencrypted pastebin! Share data responsibly! Only up to 95MB of data can be shared per pasta."
+      MICROBIN_FOOTER_TEXT: ${MICROBIN_FOOTER_TEXT:-}
       MICROBIN_HIDE_LOGO: ${MICROBIN_HIDE_LOGO:-true}
       MICROBIN_TITLE: ${MICROBIN_TITLE:-MicroBin}
       MICROBIN_THREADS: ${MICROBIN_THREADS:-1}

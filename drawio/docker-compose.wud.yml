@@ -1,0 +1,9 @@
+# WUD (What's Up Docker?) labels — notify + auto-update (same-tag digest updates)
+
+services:
+  drawio:
+    labels:
+      wud.watch: "true"
+      wud.watch.digest: "true"
+      wud.tag.include: '^$$'
+      wud.trigger.include: "smtp.gmail,docker.local"
