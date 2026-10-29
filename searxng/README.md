@@ -20,11 +20,12 @@
 
 ## Updates and rollback
 
-- `SEARXNG_VERSION` defaults to `latest`; `VALKEY_VERSION` defaults to the current upstream `9-alpine` line.
+- `SEARXNG_VERSION` defaults to `latest`; `VALKEY_VERSION` defaults to the current upstream `9-alpine` line. Tag overrides are supported via `.env`.
 - Pull images explicitly with `docker compose pull` before `docker compose up -d --wait`. Merely using the `latest` tag does not refresh an existing local image.
+- When What's Up Docker (WUD) is enabled via `docker-compose.wud.yml`, both `searxng` and `valkey` monitor digest updates with `wud.watch.digest=true` and notify / auto-update via `smtp.gmail,docker.local`. The static `wud.tag.include: '^$$'` regex policy excludes all alternative candidate tags, ensuring that `searxng` and `valkey` only receive same-tag digest updates without unintentional tag jumps or regex mismatch vulnerabilities.
 - Review upstream SearXNG container changes before deploying a new image.
-- To roll back, set `SEARXNG_VERSION` to a known dated image tag, run `docker compose pull`, and recreate the stack. Persistent configuration and cache data remain in the existing mounts.
-- When deployed by `infra-homelab`, publish this template repository first because the Ansible role consumes its remote `main` branch.
+- To roll back or pin a version, set `SEARXNG_VERSION` or `VALKEY_VERSION` in `.env` to a known dated image tag, run `docker compose pull`, and recreate the stack. The static tag filter prevents WUD from proposing other tags, preserving your pinned versions while continuing to track same-tag digest updates. Persistent configuration and cache data remain in the existing mounts.
+- When deployed by `infra-homelab`, publish this template repository first because the Ansible role consumes its remote `main` branch. The SLIME deployment entry point is `playbooks/hosts/slime/slime-searxng.yml` (or `slime.yml`), requiring protected `searxng_secret` supplied via Ansible vault.
 
 ## Engine metrics
 

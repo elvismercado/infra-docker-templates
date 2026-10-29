@@ -4,17 +4,17 @@
 # This setup is for running in my Unraid server
 
 x-base-env: &base-env
-  PUID: ${UID}
-  PGID: ${GID}
-  UID: ${UID}
-  GID: ${GID}
+  PUID: ${UID:-99}
+  PGID: ${GID:-100}
+  UID: ${UID:-99}
+  GID: ${GID:-100}
   UMASK: ${UMASK:-022}
   TZ: ${TZ:-Europe/London}
 
 name: ${CONTAINER_NAME:-drawio}
 
 networks:
-  mynetwork:
+  default:
     name: ${CONTAINER_NAME:-drawio}
     ipam:
       config:
@@ -22,13 +22,12 @@ networks:
 
 services:
   drawio:
-    image: jgraph/drawio
+    image: jgraph/drawio:${IMAGE_VERSION:-latest}
     container_name: ${CONTAINER_NAME:-drawio}
     hostname: ${CONTAINER_NAME:-drawio}
     restart: always
     networks:
-      mynetwork:
-        ipv4_address: ${IP_ADDRESS:-10.42.0.10}
+      - default
     ports:
       # - ${HTTP_PORT:-8080}:8080
       - ${HTTPS_PORT:-8443}:8443

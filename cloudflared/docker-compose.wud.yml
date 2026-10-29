@@ -1,8 +1,9 @@
-# WUD (What's Up Docker?) labels — notify + auto-update (all versions, calendar-versioned image)
+# WUD (What's Up Docker?) labels — notify + auto-update (same-tag digest updates)
 
 services:
   cloudflared:
     labels:
       - "wud.watch=true"
-      - "wud.tag.include=^\\d+\\.\\d+\\.\\d+$$"
+      - "wud.watch.digest=true"
+      - "wud.tag.include=^$$"
       - "wud.trigger.include=smtp.gmail,docker.local"

@@ -27,11 +27,10 @@ services:
     environment:
       <<: *base-env
       TUNNEL_TOKEN: ${TUNNEL_TOKEN}
-      # # Uncomment to enable metrics server (exposes /metrics, /ready, /debug/pprof)
-      # TUNNEL_METRICS: ${TUNNEL_METRICS:-0.0.0.0:2000}
+      TUNNEL_METRICS: ${TUNNEL_METRICS:-127.0.0.1:2000}
     command: tunnel --no-autoupdate run
     healthcheck:
-      test: ["CMD", "/usr/local/bin/cloudflared", "version"]
+      test: ["CMD", "/usr/local/bin/cloudflared", "tunnel", "--metrics", "${TUNNEL_METRICS:-127.0.0.1:2000}", "ready"]
       interval: 30s
       timeout: 10s
       retries: 3

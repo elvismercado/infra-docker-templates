@@ -8,35 +8,27 @@
 # TODO: change to https://www.linuxserver.io/?
 
 x-base-env: &base-env
-  PUID: ${UID}
-  PGID: ${GID}
-  UID: ${UID}
-  GID: ${GID}
+  PUID: ${UID:-99}
+  PGID: ${GID:-100}
+  UID: ${UID:-99}
+  GID: ${GID:-100}
   UMASK: ${UMASK:-022}
   TZ: ${TZ:-Europe/London}
 
 x-smtp: &smtp
-  MAIL_CONNECTION: smtp
+  MAIL_CONNECTION: ${MAIL_CONNECTION:-smtp}
   SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
   SMTP_PORT: ${SMTP_PORT:-587}
-  MAIL_SSL: true
-  MAIL_USERNAME: ${SMTP_USERNAME}
-  MAIL_PASSWORD: ${SMTP_PASSWORD}
-  MAIL_SENDER: ${SMTP_FROM}
-
-x-db: &db
-  DB_CONNECTION: sqlite
-  DB_HOST: 127.0.0.1
-  DB_PORT: 3306
-  DB_USER: root
-  DB_PASSWORD: ${DB_PASSWORD:-password}
-  DB_DATABASE: ferdium
-  DB_SSL: false
+  MAIL_SSL: ${MAIL_SSL:-false}
+  MAIL_REQUIRE_TLS: ${MAIL_REQUIRE_TLS:-false}
+  MAIL_USERNAME: ${SMTP_USERNAME:-}
+  MAIL_PASSWORD: ${SMTP_PASSWORD:-}
+  MAIL_SENDER: ${SMTP_FROM:-}
 
 name: ${CONTAINER_NAME:-ferdium-server}
 
 networks:
-  mynetwork:
+  default:
     name: ${CONTAINER_NAME:-ferdium-server}
     ipam:
       config:
@@ -44,29 +36,27 @@ networks:
 
 services:
   ferdium-server:
-    image: ferdium/ferdium-server:latest
+    image: ferdium/ferdium-server:${IMAGE_VERSION:-latest}
     container_name: ${CONTAINER_NAME:-ferdium-server}
     hostname: ${CONTAINER_NAME:-ferdium-server}
     restart: always
     networks:
-      mynetwork:
-        ipv4_address: ${IP_ADDRESS:-10.42.0.10}
+      - default
     volumes:
-      - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-ferdium-server}/data:/data
+      - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-ferdium-server}/data:${DATA_DIR:-/data}
       - ${VOLUMES_BASE:-/tmp}/${CONTAINER_NAME:-ferdium-server}/recipes:/app/build/recipes
     ports:
       - ${HTTP_PORT:-3333}:3333
     environment:
       <<: [*base-env, *smtp]
-      # <<: [*base-env, *smtp, *db] # not including DB and leaving container to handle defaults
-      NODE_ENV: production
+      NODE_ENV: ${NODE_ENV:-production}
       APP_URL: ${APP_URL:-http://127.0.0.1}
-      IS_CREATION_ENABLED: true
-      IS_DASHBOARD_ENABLED: true
-      IS_REGISTRATION_ENABLED: true
-      CONNECT_WITH_FRANZ: false
-      DATA_DIR: /data
-      JWT_USE_PEM: true
+      IS_CREATION_ENABLED: ${IS_CREATION_ENABLED:-true}
+      IS_DASHBOARD_ENABLED: ${IS_DASHBOARD_ENABLED:-true}
+      IS_REGISTRATION_ENABLED: ${IS_REGISTRATION_ENABLED:-true}
+      CONNECT_WITH_FRANZ: ${CONNECT_WITH_FRANZ:-false}
+      DATA_DIR: ${DATA_DIR:-/data}
+      JWT_USE_PEM: ${JWT_USE_PEM:-true}
     labels:
       - "com.service=${CONTAINER_NAME:-ferdium-server}"
 
